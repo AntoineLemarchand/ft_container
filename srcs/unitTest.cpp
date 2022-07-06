@@ -6,7 +6,7 @@
 /*   By: alemarch <alemarch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/06 15:18:52 by alemarch          #+#    #+#             */
-/*   Updated: 2022/07/06 15:22:00 by alemarch         ###   ########.fr       */
+/*   Updated: 2022/07/06 15:28:08 by alemarch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	printHeader(std::string header, std::string cornerLeft,
 	std::string cornerRight, int termWidth)
 {
 	std::cout << cornerLeft;
-	if (cornerRight.compare("") != 0)
+	if (cornerRight != "")
 		for (unsigned long i = 0; i < (termWidth - header.size()) / 2
 			- cornerLeft.size() - 2; i++)
 			std::cout << "━";
@@ -44,26 +44,4 @@ void	printHeader(std::string header, std::string cornerLeft,
 			i++)
 		std::cout << "━";
 	std::cout << cornerRight << std::endl;
-}
-
-void	assertLine(std::string name, std::string result1, std::string result2)
-{
-	std::cout << "┃ ";
-	if (result1.compare(result2) == 0)
-		std::cout << "\033[32m";
-	else
-		std::cout << "\033[1;31m";
-	std::cout << name << ": " << "std: " << result1 << "| ft: " << result2;
-	std::cout << "\033[0m" << std::endl;
-}
-
-void	assertLine(std::string name, int result1, int result2)
-{
-	std::cout << "┃ ";
-	if (result1 == result2)
-		std::cout << "\033[32m";
-	else
-		std::cout << "\033[1;31m";
-	std::cout << name << ": " << result1 << "|" << result2 << "\033[0m";
-	std::cout << std::endl;
 }

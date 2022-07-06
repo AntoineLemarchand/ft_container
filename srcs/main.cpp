@@ -16,11 +16,13 @@ int	main( void )
 {
 	int		termWidth = get_termWidth();
 
-	printHeader("VECTOR", "┏", "━", termWidth);
-	printHeader("CONSTRUCTORS", "┣", "", termWidth);
-	assertLine("testgood1", 1, 1);
-	assertLine("testgood2", "jean", "jean");
-	assertLine("testbad1", 0, 1);
-	assertLine("testbad2", "jean", "marc");
+	printHeader("START", "┏", "━", termWidth);
+	printHeader("FRONTEND TEST", "┣", "", termWidth);
+	assertLine("intGood", 42, 42);
+	assertLine("intBad", 42, 21);
+	assertLine("floatGood", 42.42, 42.42);
+	assertLine("floatBad", 42.42, 42.21);
+	assertLine("stringGood", "ClapTrap", "ClapTrap");
+	assertLine("stringBad", "FragTrap", "ScavTrap");
 	return (0);
 }
