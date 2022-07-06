@@ -22,9 +22,9 @@ endef
 
 SRCS			= $(addprefix srcs/, \
 						unitTest.cpp \
-						ft_vector.cpp \
-						ft_map.cpp \
-						ft_stack.cpp \
+						containers/ft_vector.cpp \
+						containers/ft_map.cpp \
+						containers/ft_stack.cpp \
 						main.cpp \
 					)
 
@@ -38,7 +38,7 @@ CXX				= c++
 
 CXXFLAGS		= -Wall -Wextra -Werror -g -std=c++98
 
-CPPFLAGS		= -I includes
+CPPFLAGS		= -I includes -I includes/containers -I includes/iterators
 
 %.o : %.cpp
 				$(call compiling,$<,$(<:.cpp=.o),0)
