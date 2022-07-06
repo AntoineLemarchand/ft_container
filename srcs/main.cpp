@@ -1,15 +1,10 @@
 #include <iostream>
-#include <string>
 
 #include <vector>
-#include <ft_vector.hpp>
-
 #include <stack>
-#include <ft_stack.hpp>
-
 #include <map>
-#include <ft_map.hpp>
 
+#include <ft.hpp>
 #include <unitTest.hpp>
 
 void	testVector(int termWidth)
@@ -131,5 +126,6 @@ int	main( void )
 	testStack(termWidth);
 	testMap(termWidth);
 	printHeader("", "█", "━", termWidth);
+
 	return (0);
 }

@@ -22,9 +22,9 @@ endef
 
 SRCS			= $(addprefix srcs/, \
 						unitTest.cpp \
-						containers/ft_vector.cpp \
-						containers/ft_map.cpp \
-						containers/ft_stack.cpp \
+						containers/vector.cpp \
+						containers/map.cpp \
+						containers/stack.cpp \
 						main.cpp \
 					)
 

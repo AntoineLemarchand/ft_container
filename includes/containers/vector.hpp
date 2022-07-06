@@ -1,22 +1,22 @@
 #pragma once
 
 template < class T, class Alloc = std::allocator<T> >
-class ft_vector
+class vector
 {
 	// CONSTRUCTORS
-	explicit ft_vector(const Alloc& alloc = Alloc());
-	explicit ft_vector(std::size_t n, const T& val = T(),
+	explicit vector(const Alloc& alloc = Alloc());
+	explicit vector(std::size_t n, const T& val = T(),
 		const Alloc& alloc = Alloc());
-	template <class ft_InputIterator>
-	ft_vector(ft_InputIterator first, ft_InputIterator last,
+	template <class InputIterator>
+	vector(InputIterator first, InputIterator last,
 		const Alloc& alloc = Alloc());
-	ft_vector(const ft_vector& x);
+	vector(const vector& x);
 
 	// DESTRUCTOR
-	~ft_vector();
+	~vector();
 
 	// OPERATOR=
-	ft_vector&	operator= (const ft_vector& x);
+	vector&	operator= (const vector& x);
 
 	// ITERATORS
 	// TODO
@@ -51,22 +51,22 @@ class ft_vector
 
 // RELATIONAL ITERATOR
 template <class T, class Alloc>
-bool operator== (const ft_vector<T,Alloc>& lhs,
-	const ft_vector<T,Alloc>& rhs);
+bool operator== (const vector<T,Alloc>& lhs,
+	const vector<T,Alloc>& rhs);
 template <class T, class Alloc>
-bool operator!= (const ft_vector<T,Alloc>& lhs,
-	const ft_vector<T,Alloc>& rhs);
+bool operator!= (const vector<T,Alloc>& lhs,
+	const vector<T,Alloc>& rhs);
 template <class T, class Alloc>
-bool operator<  (const ft_vector<T,Alloc>& lhs,
-	const ft_vector<T,Alloc>& rhs);
+bool operator<  (const vector<T,Alloc>& lhs,
+	const vector<T,Alloc>& rhs);
 template <class T, class Alloc>
-bool operator<= (const ft_vector<T,Alloc>& lhs,
-	const ft_vector<T,Alloc>& rhs);
+bool operator<= (const vector<T,Alloc>& lhs,
+	const vector<T,Alloc>& rhs);
 template <class T, class Alloc>
-bool operator>  (const ft_vector<T,Alloc>& lhs,
-	const ft_vector<T,Alloc>& rhs);
+bool operator>  (const vector<T,Alloc>& lhs,
+	const vector<T,Alloc>& rhs);
 template <class T, class Alloc>
-bool operator>= (const ft_vector<T,Alloc>& lhs,
-	const ft_vector<T,Alloc>& rhs);
+bool operator>= (const vector<T,Alloc>& lhs,
+	const vector<T,Alloc>& rhs);
 template <class T, class Alloc>
-void swap (ft_vector<T,Alloc>& x, ft_vector<T,Alloc>& y);
+void swap (vector<T,Alloc>& x, vector<T,Alloc>& y);
