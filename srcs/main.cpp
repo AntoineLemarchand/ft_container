@@ -44,14 +44,34 @@ void	testVector(int termWidth)
 	assertLine("destructor", 1, "check leaks", "check leaks");
 
 	printHeader("OPERATOR=", "┣", "", termWidth);
-	//assertLine("operator=", 42, 4);
-	//printHeader("ITERATORS", "┣", "", termWidth);
-	//assertLine("begin", 42, 4);
-	//assertLine("end", 42, 4);
-	//assertLine("rbegin", 42, 4);
-	//assertLine("rend", 42, 4);
-	//printHeader("CAPACITY", "┣", "", termWidth);
-	//assertLine("size", 42, 4);
+	ft::vector<int>	vftequal1(10,20);
+	{
+		ft::vector<int> vftequal2 = vftequal1;
+	}
+	assertLine("operator=",1, "deep copy", "deep copy");
+
+	printHeader("ITERATORS", "┣", "", termWidth);
+
+	ft::vector<int>	vftBegin(10, 10);
+	std::vector<int>	vstdBegin(10, 10);
+	vftBegin[0] = 20;
+	vstdBegin[0] = 20;
+	assertLine("begin", *vftBegin.begin() == *vstdBegin.begin(),
+		*vstdBegin.begin(), *vftBegin.begin());
+	vftBegin[vftBegin.size() - 1] = 42;
+	vstdBegin[vstdBegin.size() - 1] = 42;
+	assertLine("end", *(vftBegin.end() - 1) == *(vstdBegin.end() - 1),
+		*(vstdBegin.end() - 1), *(vftBegin.end() - 1));
+	//assertLine("rbegin", 0, 42, 42);
+	//assertLine("rend", 0, 42, 42);
+	printHeader("CAPACITY", "┣", "", termWidth);
+	std::vector<std::string>	stdEmpty;
+	ft::vector<std::string>		ftEmpty;
+	std::vector<std::string>	stdsize(42, "coucou");
+	ft::vector<std::string>		ftsize(42, "coucou");
+	assertLine("size", stdEmpty.size() == ftEmpty.size() &&
+		stdsize.size() == ftsize.size(),
+		stdEmpty.size() + stdsize.size(), ftEmpty.size() + ftsize.size());
 	//assertLine("max_size", 42, 4);
 	//assertLine("resize", 42, 4);
 	//assertLine("capacity", 42, 4);
