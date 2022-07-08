@@ -102,14 +102,29 @@ void	testVector(int termWidth)
 	ftEmpty.reserve(10);
 	assertLine("       ", stdEmpty.capacity() == ftEmpty.capacity(),
 		stdEmpty.capacity(), ftEmpty.capacity());
-	//printHeader("ELEMENT ACCESS", "┣", "", termWidth);
-	//assertLine("operator[]", 42, 4);
-	//assertLine("at", 42, 4);
-	//assertLine("front", 42, 4);
-	//assertLine("back", 42, 4);
-	//printHeader("MODIFIERS", "┣", "", termWidth);
+
+	printHeader("ELEMENT ACCESS", "┣", "", termWidth);
+	stdEmpty.clear();
+	ftEmpty.clear();
+	std::string	alphabet = "abcdefghijklmnopqrstuioprstuvwxyz";
+	for (int i = 0; i < 26; i++)
+	{
+		stdEmpty.push_back(&alphabet[i]);
+		ftEmpty.push_back(&alphabet[i]);
+	}
+	assertLine("operator[]", stdEmpty[0] == ftEmpty[0],
+		stdEmpty[0], ftEmpty[0]);
+	assertLine("          ", stdEmpty[20] == ftEmpty[20],
+		stdEmpty[20], ftEmpty[20]);
+	assertLine("          ", stdEmpty[25] == ftEmpty[25],
+		stdEmpty[25], ftEmpty[25]);
+	assertLine("front", stdEmpty.front() == ftEmpty.front(),
+		stdEmpty.front(), ftEmpty.front());
+	assertLine("back", stdEmpty.back() == ftEmpty.back(),
+		stdEmpty.back(), ftEmpty.back());
+	printHeader("MODIFIERS", "┣", "", termWidth);
 	//assertLine("assign", 42, 4);
-	//assertLine("push_bach", 42, 4);
+	//assertLine("push_back", 42, 4);
 	//assertLine("pop_back", 42, 4);
 	//assertLine("insert", 42, 4);
 	//assertLine("erase", 42, 4);

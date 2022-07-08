@@ -85,21 +85,11 @@ namespace	ft
 
 					if (this != &x)
 					{
-						_capacity = x.capacity();
-						_size = x.size();
-						if (!empty())
-							_alloc.deallocate(_content);
-						if (!x.empty())
-						{
-							_alloc = x.get_allocator();
-							_content = _alloc.allocate();
-							i = 0;
-							for (vectorIterator<T> it = x.begin; it != x.end; it++)
-							{
-								_alloc.construct(_content[i], *it);
-								i++;
-							}
-						}
+						clear();
+						reserve(x.capacity());
+						for (vectorIterator<T> it = x.begin();
+								it < x.end(); it++)
+							push_back(*it);
 					}
 					return (*this);
 				}
@@ -221,12 +211,12 @@ namespace	ft
 
 				T&			back()
 				{
-					return (_content[_size]);
+					return (_content[_size - 1]);
 				}
 
 				const T&	back() const
 				{
-					return (_content[_size]);
+					return (_content[_size - 1]);
 				}
 
 				// MODIFIERS
@@ -313,10 +303,13 @@ namespace	ft
 				{
 					std::size_t	i = 0;
 
-					for (vectorIterator<T> it = begin(); it != end(); it++)
+					if (!empty())
 					{
-						_alloc.destroy(&_content[i]);
-						i++;
+						for (vectorIterator<T> it = begin(); it != end(); it++)
+						{
+							_alloc.destroy(&_content[i]);
+							i++;
+						}
 					}
 					_size = 0;
 				};
