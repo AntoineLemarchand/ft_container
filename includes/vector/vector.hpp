@@ -35,22 +35,22 @@ namespace	ft
 
 				vector(vectorIterator<T> first, vectorIterator<T> last,
 						const Alloc& alloc = Alloc())
-					{
-						int	i;
+				{
+					int	i;
 
-						_capacity = 1;
-						_alloc = alloc;
-						for (vectorIterator<T> it = first; it != last; it++)
-							_capacity++;
-						_size = _capacity;
-						_content =  _alloc.allocate(_capacity);
-						i = 0;
-						for (vectorIterator<T> it = first; it != last; it++)
-						{
-							_alloc.construct(&_content[i], *it);
-							i++;
-						}
+					_capacity = 1;
+					_alloc = alloc;
+					for (vectorIterator<T> it = first; it != last; it++)
+						_capacity++;
+					_size = _capacity;
+					_content =  _alloc.allocate(_capacity);
+					i = 0;
+					for (vectorIterator<T> it = first; it != last; it++)
+					{
+						_alloc.construct(&_content[i], *it);
+						i++;
 					}
+				}
 
 				vector(const vector& x)
 				{
@@ -129,7 +129,13 @@ namespace	ft
 					return (_alloc.max_size());
 				}
 
-				void		resize (std::size_t n, T val = T());
+				void		resize (std::size_t n, T val = T())
+				{
+					while (n < _size)
+						pop_back();
+					while (n > _size)
+						push_back(val);
+				}
 
 				std::size_t	capacity() const
 				{
@@ -150,10 +156,15 @@ namespace	ft
 					if (_capacity < n)
 					{
 						swp = _alloc.allocate(n);
-						for (int i = 0; i < _size; i++)
-							_alloc.construct(swp[i], _content[i]);
-						_alloc.deallocate(_content);
+						for (std::size_t i = 0; i < _size; i++)
+						{
+							_alloc.construct(&swp[i], _content[i]);
+							_alloc.destroy(&_content[i]);
+						}
+						if (_capacity)
+							_alloc.deallocate(_content, _capacity);
 						_content = swp;
+						_capacity = n;
 					}
 				}
 
@@ -221,22 +232,22 @@ namespace	ft
 				// MODIFIERS
 				template <class InputIterator>
 					void assign (InputIterator first, InputIterator last)
-				{
-					std::size_t	capa;
-					std::size_t	i;
-
-					clear();
-					capa = 0;
-					for (InputIterator it = first; it != last; it++)
-						capa++;
-					reserve(capa);
-					i = 0;
-					for (InputIterator it = first; it != last; it++)
 					{
-						_alloc.construct(_content[i], *it);
-						i++;
+						std::size_t	capa;
+						std::size_t	i;
+
+						clear();
+						capa = 0;
+						for (InputIterator it = first; it != last; it++)
+							capa++;
+						reserve(capa);
+						i = 0;
+						for (InputIterator it = first; it != last; it++)
+						{
+							_alloc.construct(_content[i], *it);
+							i++;
+						}
 					}
-				}
 
 				void assign (std::size_t n, const T& val)
 				{
@@ -250,13 +261,17 @@ namespace	ft
 				void push_back (const T& val)
 				{
 					reserve(_size + 1);
-					_content[_size] = val;
+					_alloc.construct(_content + _size, val);
 					_size++;
 				}
-				
+
 				void pop_back()
 				{
-					erase(end());
+					if (!empty())
+					{
+						_alloc.destroy(_content + _size - 1);
+						_size--;
+					}
 				}
 
 				vectorIterator<T> insert (vectorIterator<T> position,
@@ -271,23 +286,22 @@ namespace	ft
 
 				vectorIterator<T> erase (vectorIterator<T> position)
 				{
-					vectorIterator<T>	contentEnd(end());
-					std::size_t	i = 0;
-					std::size_t	j = 0;
+					std::size_t i = 0;
+					vectorIterator<T> ret;
 
-					for (vectorIterator<T> it = begin(); it < end(); it++)
-					{
-						_alloc.construct(&_content[j], _content[i]);
-						if (it == position)
-							i++;
+					for (vectorIterator<T> it = begin(); it < position; it++)
 						i++;
-						j++;
+					if (i < _size)
+						ret = position;
+					else
+						ret = end();
+					for (vectorIterator<T> it = position + 1; it < end(); it++)
+					{
+						_content[i] = _content[i + 1];
+						i++;
 					}
-					_size--;
-					_alloc.destroy(&_content[_size]);
-					if (position == contentEnd)
-						return (end());
-					return (position);
+					pop_back();
+					return (ret);
 				}
 
 				vectorIterator<T> erase (vectorIterator<T> first,
@@ -297,8 +311,14 @@ namespace	ft
 
 				void clear()
 				{
-					while (_size)
-						erase(begin());
+					std::size_t	i = 0;
+
+					for (vectorIterator<T> it = begin(); it != end(); it++)
+					{
+						_alloc.destroy(&_content[i]);
+						i++;
+					}
+					_size = 0;
 				};
 
 				// ALLOCATOR

@@ -72,11 +72,36 @@ void	testVector(int termWidth)
 	assertLine("size", stdEmpty.size() == ftEmpty.size() &&
 		stdsize.size() == ftsize.size(),
 		stdEmpty.size() + stdsize.size(), ftEmpty.size() + ftsize.size());
-	//assertLine("max_size", 42, 4);
-	//assertLine("resize", 42, 4);
-	//assertLine("capacity", 42, 4);
-	//assertLine("empty", 42, 4);
-	//assertLine("reserve", 42, 4);
+	assertLine("max_size", stdEmpty.max_size() == ftEmpty.max_size(),
+		stdEmpty.max_size(), ftEmpty.max_size());
+	stdEmpty.resize(42, "oh");
+	ftEmpty.resize(42, "oh");
+	assertLine("resize", stdEmpty.size() == ftEmpty.size(),
+		stdEmpty.size(), ftEmpty.size());
+	assertLine("      ", *stdEmpty.begin() == *ftEmpty.begin(),
+		*stdEmpty.begin(), *ftEmpty.begin());
+	stdEmpty.resize(40, "ah");
+	ftEmpty.resize(40, "ah");
+	assertLine("      ", stdEmpty.size() == ftEmpty.size(),
+		stdEmpty.size(), ftEmpty.size());
+	assertLine("      ", *stdEmpty.begin() == *ftEmpty.begin(),
+		*stdEmpty.begin(), *ftEmpty.begin());
+	assertLine("capacity", stdEmpty.capacity() == ftEmpty.capacity(),
+		stdEmpty.capacity(), ftEmpty.capacity());
+	assertLine("empty", stdEmpty.empty() == ftEmpty.empty(),
+		stdEmpty.empty(), ftEmpty.empty());
+	stdEmpty.clear();
+	ftEmpty.clear();
+	assertLine("     ", stdEmpty.empty() == ftEmpty.empty(),
+		stdEmpty.empty(), ftEmpty.empty());
+	stdEmpty.reserve(100);
+	ftEmpty.reserve(100);
+	assertLine("reserve", stdEmpty.capacity() == ftEmpty.capacity(),
+		stdEmpty.capacity(), ftEmpty.capacity());
+	stdEmpty.reserve(10);
+	ftEmpty.reserve(10);
+	assertLine("       ", stdEmpty.capacity() == ftEmpty.capacity(),
+		stdEmpty.capacity(), ftEmpty.capacity());
 	//printHeader("ELEMENT ACCESS", "┣", "", termWidth);
 	//assertLine("operator[]", 42, 4);
 	//assertLine("at", 42, 4);

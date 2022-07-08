@@ -6,7 +6,7 @@
 /*   By: alemarch <alemarch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/06 15:18:52 by alemarch          #+#    #+#             */
-/*   Updated: 2022/07/06 17:09:35 by alemarch         ###   ########.fr       */
+/*   Updated: 2022/07/08 10:13:37 by alemarch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,10 @@ void	printHeader(std::string header, std::string cornerLeft,
 			- cornerLeft.size() - 2; i++)
 			std::cout << "━";
 	if (header.compare("") != 0)
-		std::cout << " ";
+		std::cout << "━";
 	std::cout << header;
 	if (header.compare("") != 0)
-		std::cout << " ";
+		std::cout << "━";
 	if (cornerRight.compare("") != 0)
 		for (unsigned long i = 0; i < (termWidth - header.size()
 			+ (termWidth - header.size()) % 2 ) / 2 - cornerRight.size() - 2;
