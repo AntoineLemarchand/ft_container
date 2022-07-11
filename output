@@ -1,0 +1,38 @@
+==335985== Memcheck, a memory error detector
+==335985== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==335985== Using Valgrind-3.16.1 and LibVEX; rerun with -h for copyright info
+==335985== Command: ./compare_containers
+==335985== 
+==335985== Invalid free() / delete / delete[] / realloc()
+==335985==    at 0x4839EAB: operator delete(void*) (vg_replace_malloc.c:584)
+==335985==    by 0x111A45: __gnu_cxx::new_allocator<int>::deallocate(int*, unsigned long) (new_allocator.h:133)
+==335985==    by 0x10F233: ft::vector<int, std::allocator<int> >::~vector() (vector.hpp:84)
+==335985==    by 0x10EE33: main (main.cpp:239)
+==335985==  Address 0x4d7cea0 is 0 bytes inside a block of size 16 free'd
+==335985==    at 0x4839EAB: operator delete(void*) (vg_replace_malloc.c:584)
+==335985==    by 0x111A45: __gnu_cxx::new_allocator<int>::deallocate(int*, unsigned long) (new_allocator.h:133)
+==335985==    by 0x1117F8: void ft::vector<int, std::allocator<int> >::insert<std::reverse_iterator<std::_List_iterator<int> > >(ft::vectorIterator<int>, std::reverse_iterator<std::_List_iterator<int> >, std::reverse_iterator<std::_List_iterator<int> >) (vector.hpp:366)
+==335985==    by 0x10EE13: main (main.cpp:246)
+==335985==  Block was alloc'd at
+==335985==    at 0x4838DEF: operator new(unsigned long) (vg_replace_malloc.c:342)
+==335985==    by 0x111B33: __gnu_cxx::new_allocator<int>::allocate(unsigned long, void const*) (new_allocator.h:115)
+==335985==    by 0x11329F: ft::vector<int, std::allocator<int> >::reserve(unsigned long) (vector.hpp:166)
+==335985==    by 0x111CA2: ft::vector<int, std::allocator<int> >::push_back(int const&) (vector.hpp:261)
+==335985==    by 0x1112BE: ft::vector<int, std::allocator<int> >::vector<std::_List_iterator<int> >(std::_List_iterator<int>, ft::enable_if<!ft::is_integral<std::_List_iterator<int> >::value, std::_List_iterator<int> >::type, std::allocator<int> const&) (vector.hpp:59)
+==335985==    by 0x10ED09: main (main.cpp:239)
+==335985== 
+==335985== 
+==335985== HEAP SUMMARY:
+==335985==     in use at exit: 32 bytes in 1 blocks
+==335985==   total heap usage: 9 allocs, 9 frees, 72,860 bytes allocated
+==335985== 
+==335985== LEAK SUMMARY:
+==335985==    definitely lost: 32 bytes in 1 blocks
+==335985==    indirectly lost: 0 bytes in 0 blocks
+==335985==      possibly lost: 0 bytes in 0 blocks
+==335985==    still reachable: 0 bytes in 0 blocks
+==335985==         suppressed: 0 bytes in 0 blocks
+==335985== Rerun with --leak-check=full to see details of leaked memory
+==335985== 
+==335985== For lists of detected and suppressed errors, rerun with: -s
+==335985== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)

@@ -15,8 +15,6 @@ void	testVector(int termWidth)
 	std::vector<int>	*vstd;
 	ft::vector<int>	*vft;
 
-	printHeader("VECTOR", "█", "━", termWidth);
-
 	printHeader("CONSTRUCTOR", "┣", "", termWidth);
 	vstd = new std::vector<int>;
 	vft = new ft::vector<int>;
@@ -34,7 +32,7 @@ void	testVector(int termWidth)
 	ft::vector<int>	vft2(10,10);
 	ft::vectorIterator<int> itft1(vft2.begin());
 	ft::vectorIterator<int> itft2(vft2.end());
-	vft = new ft::vector<int>(itft, itft2);
+	vft = new ft::vector<int>(itft1, itft2);
 	assertLine("range constructor", vft != NULL, vstd, vft);
 	ft::vector<int> vft3(vft2);
 	assertLine("copy constructor", &vft3 != &vft2, &vft2, &vft3);
@@ -50,20 +48,24 @@ void	testVector(int termWidth)
 	}
 	assertLine("operator=",1, "deep copy", "deep copy");
 
+	printHeader("VECTOR", "█", "━", termWidth);
+
 	printHeader("ITERATORS", "┣", "", termWidth);
 
 	ft::vector<int>	vftBegin(10, 10);
 	std::vector<int>	vstdBegin(10, 10);
 	vftBegin[0] = 20;
 	vstdBegin[0] = 20;
-	assertLine("begin", *vftBegin.begin() == *vstdBegin.begin(),
-		*vstdBegin.begin(), *vftBegin.begin());
 	vftBegin[vftBegin.size() - 1] = 42;
 	vstdBegin[vstdBegin.size() - 1] = 42;
+	assertLine("begin", *vftBegin.begin() == *vstdBegin.begin(),
+		*vstdBegin.begin(), *vftBegin.begin());
 	assertLine("end", *(vftBegin.end() - 1) == *(vstdBegin.end() - 1),
 		*(vstdBegin.end() - 1), *(vftBegin.end() - 1));
-	//assertLine("rbegin", 0, 42, 42);
-	//assertLine("rend", 0, 42, 42);
+	assertLine("rbegin", *vftBegin.rbegin() == *vstdBegin.rbegin(),
+		*vstdBegin.rbegin(), *vftBegin.rbegin());
+	assertLine("rend", *(vftBegin.rend() - 1) == *(vstdBegin.rend() - 1),
+		*(vstdBegin.rend() - 1), *(vftBegin.rend()- 1));
 	printHeader("CAPACITY", "┣", "", termWidth);
 	std::vector<std::string>	stdEmpty;
 	ft::vector<std::string>		ftEmpty;
@@ -123,9 +125,21 @@ void	testVector(int termWidth)
 	assertLine("back", stdEmpty.back() == ftEmpty.back(),
 		stdEmpty.back(), ftEmpty.back());
 	printHeader("MODIFIERS", "┣", "", termWidth);
-	//assertLine("assign", 42, 4);
-	//assertLine("push_back", 42, 4);
-	//assertLine("pop_back", 42, 4);
+	ftEmpty.clear();
+	stdEmpty.clear();
+	ftEmpty.assign(42, "hello");
+	stdEmpty.assign(21, "goodbye");
+	assertLine("assign", *ftEmpty.begin() == *ftEmpty.end(),
+		ftEmpty[0], *ftEmpty.end());
+	ftEmpty.assign(stdEmpty.begin(), stdEmpty.end());
+	assertLine("      ", *ftEmpty.begin() == *(ftEmpty.end() - 1) && ftEmpty.size() == 21,
+		*ftEmpty.begin(), *(ftEmpty.end() - 1));
+	ftEmpty.push_back("push");
+	stdEmpty.push_back("push");
+	assertLine("push_back", *ftEmpty.rbegin() == *stdEmpty.rbegin(), *ftEmpty.rbegin(), *stdEmpty.rbegin());
+	ftEmpty.pop_back();
+	stdEmpty.pop_back();
+	assertLine("pop_back", *ftEmpty.rbegin() == *stdEmpty.rbegin(), *ftEmpty.rbegin(), *stdEmpty.rbegin());
 	//assertLine("insert", 42, 4);
 	//assertLine("erase", 42, 4);
 	//assertLine("swap", 42, 4);
@@ -206,6 +220,61 @@ void	testMap(int termWidth)
 	//assertLine("get_allocator", 42, 4);
 }
 
+//#include "../includes/vector/containers_test/srcs/base.hpp"
+#define TESTED_NAMESPACE ft
+#define TESTED_TYPE int
+
+void	prepost_incdec(TESTED_NAMESPACE::vector<TESTED_TYPE> &vct)
+{
+	TESTED_NAMESPACE::vector<TESTED_TYPE>::iterator it = vct.begin();
+	TESTED_NAMESPACE::vector<TESTED_TYPE>::iterator it_tmp;
+
+	std::cout << "Pre inc" << std::endl;
+	it_tmp = ++it;
+	std::cout << *it_tmp << " | " << *it << std::endl;
+
+	std::cout << "Pre dec" << std::endl;
+	it_tmp = --it;
+	std::cout << *it_tmp << " | " << *it << std::endl;
+
+	std::cout << "Post inc" << std::endl;
+	it_tmp = it++;
+	std::cout << *it_tmp << " | " << *it << std::endl;
+
+	std::cout << "Post dec" << std::endl;
+	it_tmp = it--;
+	std::cout << *it_tmp << " | " << *it << std::endl;
+	std::cout << "###############################################" << std::endl;
+}
+
+int		main(void)
+{
+	const int size = 5;
+	TESTED_NAMESPACE::vector<TESTED_TYPE> vct(size);
+	TESTED_NAMESPACE::vector<TESTED_TYPE>::iterator it = vct.begin();
+	TESTED_NAMESPACE::vector<TESTED_TYPE>::const_iterator ite = vct.begin();
+
+	for (int i = 0; i < size; ++i)
+		it[i] = (size - i) * 5;
+	prepost_incdec(vct);
+
+	it = it + 5;
+	it = 1 + it;
+	it = it - 4;
+	std::cout << *(it += 2) << std::endl;
+	std::cout << *(it -= 1) << std::endl;
+
+	*(it -= 2) = 42;
+	*(it += 2) = 21;
+
+	std::cout << "const_ite +=: " << *(ite += 2) << std::endl;
+	std::cout << "const_ite -=: " << *(ite -= 2) << std::endl;
+
+	std::cout << "(it == const_it): " << (ite == it) << std::endl;
+	std::cout << "(const_ite - it): " << (ite - it) << std::endl;
+}
+
+/*
 int	main( void )
 {
 	int		termWidth = get_termWidth();
@@ -214,6 +283,6 @@ int	main( void )
 	testStack(termWidth);
 	testMap(termWidth);
 	printHeader("", "█", "━", termWidth);
-
 	return (0);
 }
+*/

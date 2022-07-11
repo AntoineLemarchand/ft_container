@@ -2,4 +2,4 @@
 *.swp
 *.swo
 compare_containers
-container_test/
+containers_test/

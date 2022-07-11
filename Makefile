@@ -22,10 +22,6 @@ endef
 
 SRCS			= $(addprefix srcs/, \
 						unitTest.cpp \
-						vector/vectorIterator.cpp \
-						vector/vector.cpp \
-						stack/stack.cpp \
-						map/map.cpp \
 						main.cpp \
 					)
 
