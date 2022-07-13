@@ -1,9 +1,9 @@
 #pragma once
 #include "vectorIterator.hpp"
-#include "../enable_if.hpp"
-#include "../is_integral.hpp"
-#include "../equal.hpp"
-#include "../lexicographical_compare.hpp"
+#include "../utils/enable_if.hpp"
+#include "../utils/is_integral.hpp"
+#include "../utils/equal.hpp"
+#include "../utils/lexicographical_compare.hpp"
 
 namespace	ft
 {
@@ -11,18 +11,18 @@ namespace	ft
 		class vector
 		{
 			public:
-				typedef	T        value_type;
-				typedef	Alloc    allocator_type;
-				typedef	T&       reference;
-				typedef	const T& const_reference;
-				typedef	T*       pointer;
-				typedef	const T* const_pointer;
-				typedef	vectorIterator<value_type>       iterator;
-				typedef	vectorIterator<const value_type>	const_iterator;
-				typedef	reverse_vectorIterator<value_type>	reverse_iterator;
+				typedef	T											value_type;
+				typedef	Alloc										allocator_type;
+				typedef	T&											reference;
+				typedef	const T&									const_reference;
+				typedef	T*											pointer;
+				typedef	const T*									const_pointer;
+				typedef	vectorIterator<value_type>					iterator;
+				typedef	vectorIterator<const value_type>			const_iterator;
+				typedef	reverse_vectorIterator<value_type>			reverse_iterator;
 				typedef	reverse_vectorIterator<const value_type>	const_reverse_iterator;
-				typedef	std::ptrdiff_t	difference_type;
-				typedef	std::size_t	size_type;
+				typedef	std::ptrdiff_t								difference_type;
+				typedef	std::size_t									size_type;
 
 				// CONSTRUCTORS
 				explicit vector(const allocator_type& alloc = Alloc())
@@ -40,7 +40,7 @@ namespace	ft
 					_size = n;
 					_alloc = alloc;
 					_content = _alloc.allocate(_capacity);
-					for (size_type i = 0; i < n; i++)
+					for (size_type i = 0; i < _capacity; i++)
 						_alloc.construct(&_content[i], val);
 				}
 
@@ -276,98 +276,42 @@ namespace	ft
 
 				iterator insert (iterator position, const_reference val)
 				{
-					iterator	ret;
-					pointer		newContent;
-					size_type	i = 0;
+					value_type	swp;
+					size_type	val_ret = 0;
 
-					if (_size == _capacity)
-						newContent = _alloc.allocate(_capacity + 1);
-					else
-						newContent = _alloc.allocate(_capacity);
-					for (iterator it = begin(); it < position; it++)
+					if (position != end())
 					{
-						_alloc.construct(&newContent[i], *it);
-						i++;
+						for (iterator it = begin(); it != position; it++)
+							val_ret++;
+						push_back(val);
+						for (size_type i = _size - 1; i > val_ret; i--)
+						{
+							swp = _content[i];
+							_content[i] = _content[i - 1];
+							_content[i - 1] = swp;
+						}
+						return (iterator(_content + val_ret));
 					}
-					_alloc.construct(&newContent[i], val);
-					ret = iterator(&newContent[i]);
-					for (iterator it = position; it < end(); it++)
-					{
-						_alloc.construct(&newContent[i + 1], *it);
-						i++;
-					}
-					clear();
-					_alloc.deallocate(_content, _capacity);
-					_size++;
-					if (_capacity < _size)
-						_capacity++;
-					return (ret);
+					push_back(val);
+					return (end() - 1);
 				}
 
 				void insert (iterator position, size_type n,
 						const_reference val)
 				{
-					pointer		newContent;
-					size_type	i = 0;
-
-					if (_capacity < _size + n)
-						newContent = _alloc.allocate(_capacity + n);
-					else
-						newContent = _alloc.allocate(_capacity);
-					for (iterator it = begin(); it < position; it++)
+					while (n)
 					{
-						_alloc.construct(&newContent[i], *it);
-						i++;
+						position = insert(position, val);
+						n--;
 					}
-					for (size_type n2 = n; n2; n2--)
-					{
-						_alloc.construct(&newContent[i], val);
-						i++;
-					}
-					for (iterator it = position; it < end(); it++)
-					{
-						_alloc.construct(&newContent[i + n], *it);
-						i++;
-					}
-					clear();
-					_alloc.deallocate(_content, _capacity);
-					_size += n;
-					if (_capacity < _size)
-						_capacity += n;
 				}
 
 				template <class InputIterator>
 					void insert (iterator position, InputIterator first,
 							typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type last)
 					{
-						pointer		newContent;
-						size_type	i = 0;
-						size_type	j = 0;
-
 						for (InputIterator it = first; it != last; it++)
-							j++;
-						if (_capacity < _size + j)
-							newContent = _alloc.allocate(_capacity + j);
-						else
-							newContent = _alloc.allocate(_capacity);
-						for (iterator it = begin(); it < position; it++)
-						{
-							_alloc.construct(&newContent[i], *it);
-							i++;
-						}
-						for (InputIterator it = first; it != last; it++)
-							_alloc.construct(&newContent[i], *it);
-						for (iterator it = position; it < end(); it++)
-						{
-							_alloc.construct(&newContent[i + j], *it);
-							i++;
-						}
-						clear();
-						if (!empty())
-							_alloc.deallocate(_content, _capacity);
-						_size += j;
-						if (_capacity < _size)
-							_capacity += j;
+							position = insert(position, *it) + 1;
 					}
 
 				iterator erase (iterator position)
@@ -392,57 +336,31 @@ namespace	ft
 
 				iterator erase (iterator first, iterator last)
 				{
-					int i = 0;
-					int j = 0;
-
-					for (iterator it = begin(); it < first; it++)
+					int	i = 0;
+					for (iterator it = first; it != last; it++)
 						i++;
-					for (iterator it = first; it < last; it++)
-						j++;
-					for (iterator it = last; it < end(); it++)
-						_content[i] = _content[i + j];
-					while (j)
+					while (i)
 					{
-						pop_back();
-						j--;
+						erase(first);
+						i--;
 					}
-					return (&_content[i]);
+					return (first);
 				}
 
 				void swap (vector& x)
 				{
-					pointer		tmp = NULL;
-					size_type	capa_tmp = x.capacity();
-					size_type	size_tmp = x.size();
+					pointer		tmp = _content;
+					size_type	capa_tmp = _capacity;
+					size_type	size_tmp = _size;
 
 					if (*this == x)
 						return;
-					if (x.capacity())
-					{
-						tmp = _alloc.allocate(x.capacity());
-						for (size_type i = 0; i < x.size(); i++)
-							_alloc.construct(&tmp[i], x[i]);
-						x.clear();
-						x.get_allocator().deallocate(&(*x.begin()),
-							x.capacity());
-					}
-					if (_capacity)
-					{
-						x.reserve(_capacity);
-						for (iterator it = begin(); it != end(); it++)
-							x.push_back(*it);
-						clear();
-						_alloc.deallocate(_content, _capacity);
-					}
-					_capacity = capa_tmp;
-					if (capa_tmp)
-					{
-						_content = _alloc.allocate(capa_tmp);
-						for (size_type i = 0; i < size_tmp; i++)
-							push_back(tmp[i]);
-					}
-					else
-						_content = NULL;
+					_content = x._content;
+					_capacity = x._capacity;
+					_size = x._size;
+					x._content = tmp;
+					x._capacity = capa_tmp;
+					x._size = size_tmp;
 				}
 
 				void clear()
@@ -470,7 +388,7 @@ namespace	ft
 
 	// RELATIONAL ITERATOR
 	template <class T, class Alloc>
-		bool operator== (const vector<T,Alloc>& lhs,
+		bool operator == (const vector<T,Alloc>& lhs,
 				const vector<T,Alloc>& rhs)
 		{
 			if (lhs.size() != rhs.size())
@@ -479,42 +397,45 @@ namespace	ft
 		}
 
 	template <class T, class Alloc>
-		bool operator!= (const vector<T,Alloc>& lhs,
+		bool operator != (const vector<T,Alloc>& lhs,
 				const vector<T,Alloc>& rhs)
 		{
 			return (!(lhs == rhs));
 		}
 
 	template <class T, class Alloc>
-		bool operator<  (const vector<T,Alloc>& lhs,
+		bool operator <  (const vector<T,Alloc>& lhs,
 				const vector<T,Alloc>& rhs)
 		{
 			return (lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(),
-						rhs.end()));
+						rhs.end()) && lhs != rhs);
 		}
 
 	template <class T, class Alloc>
-		bool operator<= (const vector<T,Alloc>& lhs,
+		bool operator <= (const vector<T,Alloc>& lhs,
 				const vector<T,Alloc>& rhs)
 		{
 			return (lhs == rhs || lhs < rhs);
 		}
 
 	template <class T, class Alloc>
-		bool operator>  (const vector<T,Alloc>& lhs,
+		bool operator >  (const vector<T,Alloc>& lhs,
 				const vector<T,Alloc>& rhs)
 		{
 			return (!lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(),
-						rhs.end()));
+						rhs.end()) && lhs != rhs);
 		}
 
 	template <class T, class Alloc>
-		bool operator>= (const vector<T,Alloc>& lhs,
+		bool operator >= (const vector<T,Alloc>& lhs,
 				const vector<T,Alloc>& rhs)
 		{
 			return (lhs == rhs || lhs > rhs);
 		}
 
 	template <class T, class Alloc>
-		void swap (vector<T,Alloc>& x, vector<T,Alloc>& y);
+		void swap (vector<T,Alloc>& x, vector<T,Alloc>& y)
+		{
+			x.swap(y);
+		}
 }

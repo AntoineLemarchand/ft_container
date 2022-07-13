@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../iterator_traits.hpp"
+#include "../utils/iterator_traits.hpp"
+#include "../utils/enable_if.hpp"
+#include "../utils/is_integral.hpp"
 
 namespace ft
 {
@@ -11,10 +13,10 @@ namespace ft
 				T*	_pointer;
 			public:
 				typedef	typename iterator_traits<T*>::difference_type	difference_type;
-				typedef	typename iterator_traits<T*>::value_type			value_type;
+				typedef	typename iterator_traits<T*>::value_type		value_type;
 				typedef	typename iterator_traits<T*>::pointer			pointer;
-				typedef	typename iterator_traits<T*>::reference		reference;
-				typedef typename iterator_traits<T*>::iterator_category iterator_category;
+				typedef	typename iterator_traits<T*>::reference			reference;
+				typedef typename iterator_traits<T*>::iterator_category	iterator_category;
 
 				// CONSTRUCTORS
 				vectorIterator( void )
@@ -22,14 +24,14 @@ namespace ft
 					_pointer = NULL;
 				}
 
-//				operator vectorIterator<const T>() const
-//				{
-//					return (vectorIterator<const T>(_pointer));
-//				}
+				//	operator vectorIterator<const T>() const
+				//	{
+				//		return (vectorIterator<const T>(_pointer));
+				//	}
 
 				vectorIterator( const vectorIterator<value_type>& it)
 				{
-					_pointer = it.getPointer();
+					_pointer = &(*it);
 				}
 
 				vectorIterator( pointer ptr )
@@ -39,71 +41,44 @@ namespace ft
 
 				// DESTRUCTOR
 				~vectorIterator( void ) {}
-				
+
 				// OPERATOR OVERLOAD
-				vectorIterator& operator = (const vectorIterator<value_type>& it)
+				vectorIterator& operator = ( const vectorIterator& it)
 				{
-					_pointer = it.getPointer();
+					if (this != &it)
+						_pointer = &(*it);
 					return (*this);
 				}
 
 				// COMPARISON
 				bool	operator == (const vectorIterator<const value_type>& it) const
 				{
-					return (_pointer == it.getPointer());
+					return (_pointer == &(*it));
 				}
 
 				bool	operator != (const vectorIterator<const value_type>& it) const
 				{
-					return (_pointer != it.getPointer());
+					return (_pointer != &(*it));
 				}
 
 				bool	operator >= (const vectorIterator<const value_type>& it) const
 				{
-					return (_pointer >= it.getPointer());
+					return (_pointer >= &(*it));
 				}
 
 				bool	operator <= (const vectorIterator<const value_type>& it) const
 				{
-					return (_pointer >= it.getPointer());
+					return (_pointer <= &(*it));
 				}
 
 				bool	operator > (const vectorIterator<const value_type>& it) const
 				{
-					return (_pointer > it.getPointer());
+					return (_pointer > &(*it));
 				}
 
 				bool	operator < (const vectorIterator<const value_type>& it) const
 				{
-					return (_pointer < it.getPointer());
-				}
-
-				// PRE INCREMENT/DECREMENT
-				vectorIterator& operator ++ ( void )
-				{
-					++_pointer;
-					return (*this);
-				}
-
-				vectorIterator& operator -- ( void )
-				{
-					--_pointer;
-					return (*this);
-				}
-
-				// POST INCREMENT/DECREMENT
-				vectorIterator operator ++ ( int )
-				{
-					vectorIterator tmp(*this);
-					_pointer++;
-					return (tmp);
-				}
-
-				vectorIterator operator -- ( int )
-				{
-					vectorIterator tmp(*this);
-					_pointer--;
-					return (tmp);
+					return (_pointer < &(*it));
 				}
 
 				// DEREFERENCING
@@ -117,49 +92,82 @@ namespace ft
 					return (_pointer);
 				}
 
-				reference operator [] ( const std::size_t n)
+				reference operator [] ( const std::size_t n )
 				{
-					return (_pointer + n);
+					return (*(_pointer + n));
 				}
 
 				// OPERATIONS
 
-				vectorIterator operator + ( const int n ) const
+				// ADDITION
+				vectorIterator operator + ( difference_type n ) const
 				{
 					return (vectorIterator(_pointer + n));
 				}
 
-				vectorIterator operator - ( const int n ) const
-				{
-					return (vectorIterator(_pointer - n));
-				}
-
 				difference_type operator + ( const vectorIterator& it) const
 				{
-					return (_pointer + it.getPointer());
-				}
-
-				difference_type operator - ( const vectorIterator& it) const
-				{
-					return (_pointer - it.getPointer());
+					return (reinterpret_cast<long>(_pointer) + reinterpret_cast<long>(&(*it)));
 				}
 
 				vectorIterator& operator += ( const int n )
-				{
-					_pointer -= n;
-					return (*this);
-				}
-
-				vectorIterator& operator -= ( const int n )
 				{
 					_pointer += n;
 					return (*this);
 				}
 
-				// OTHER MEMBER
-				pointer	getPointer( void ) const
+				friend vectorIterator operator + (difference_type n, vectorIterator& it)
 				{
-					return (_pointer);
+					return (vectorIterator(n + it._pointer));
+				}
+
+				// PRE/POST INCREMENT
+				vectorIterator& operator ++ ( void )
+				{
+					++_pointer;
+					return (*this);
+				}
+
+				vectorIterator operator ++ ( int )
+				{
+					vectorIterator tmp(*this);
+					_pointer++;
+					return (tmp);
+				}
+				// SUBSTRACTION
+				vectorIterator operator - ( const int n ) const
+				{
+					return (vectorIterator(_pointer - n));
+				}
+
+				difference_type operator - ( const vectorIterator& it) const
+				{
+					return (_pointer - &(*it));
+				}
+
+				vectorIterator& operator -= ( const int n )
+				{
+					_pointer -= n;
+					return (*this);
+				}
+
+				friend vectorIterator operator - (difference_type n, vectorIterator& it)
+				{
+					return (vectorIterator(n - it._pointer));
+				}
+
+				// PRE/POST DECREMENT
+				vectorIterator operator -- ( int )
+				{
+					vectorIterator tmp(*this);
+					_pointer--;
+					return (tmp);
+				}
+
+				vectorIterator& operator -- ( void )
+				{
+					--_pointer;
+					return (*this);
 				}
 		};
 
@@ -194,9 +202,10 @@ namespace ft
 
 				operator reverse_vectorIterator<const T>() const
 				{
-					return (reverse_vectorIterator<const T>(_it.getPointer()));
+					return (reverse_vectorIterator<const T>(&(*_it)));
 				}
 
+				// DEREFERENCE
 				vectorIterator<T> base() const
 				{
 					return (_it);
@@ -207,6 +216,17 @@ namespace ft
 					return (*_it);
 				}
 
+				pointer operator->() const
+				{
+					return (&(*_it));
+				}
+
+				reference operator [] (difference_type n) const
+				{
+					return (*(_it - n));
+				}
+
+				// COMPARISON
 				bool	operator == (const reverse_vectorIterator<const value_type>& it) const
 				{
 					return (_it == it.base());
@@ -217,11 +237,50 @@ namespace ft
 					return (_it != it.base());
 				}
 
-				reverse_vectorIterator<T> operator + (difference_type n)
+				bool	operator < (const reverse_vectorIterator<const value_type>& it) const
+				{
+					return (_it >= it.base());
+				}
+
+				bool	operator <= (const reverse_vectorIterator<const value_type>& it) const
+				{
+					return (_it > it.base());
+				}
+
+				bool	operator > (const reverse_vectorIterator<const value_type>& it) const
+				{
+					return (_it <= it.base());
+				}
+
+				bool	operator >= (const reverse_vectorIterator<const value_type>& it) const
+				{
+					return (_it < it.base());
+				}
+
+				// ADDITION
+				reverse_vectorIterator<T> operator + (difference_type n) const
 				{
 					return (reverse_vectorIterator(_it - n));
 				}
 
+				difference_type operator + (const reverse_vectorIterator<T>& n) const
+				{
+					return (n.base() - _it);
+				}
+
+				friend reverse_vectorIterator<T> operator + (
+						difference_type n, const reverse_vectorIterator<T>& rev_it)
+				{
+					return (reverse_vectorIterator<T>(&(*rev_it) - n));
+				}
+
+				reverse_vectorIterator<T>& operator+= (difference_type n)
+				{
+					_it -= n;
+					return (*this);
+				}
+
+				// PRE/POST INCREMENT
 				reverse_vectorIterator<T>& operator++( void )
 				{
 					--_it;
@@ -235,17 +294,30 @@ namespace ft
 					return (tmp);
 				}
 
-				reverse_vectorIterator<T>& operator+= (difference_type n)
+				//SUBSTRACTION
+				friend reverse_vectorIterator<T> operator - (
+						difference_type n, const reverse_vectorIterator<T>& rev_it)
 				{
-					_it -= n;
-					return (*this);
+					return (reverse_vectorIterator<T>(n + rev_it._pointer));
 				}
 
-				reverse_vectorIterator<T> operator - (difference_type n)
+				reverse_vectorIterator<T> operator - (difference_type n) const
 				{
 					return (reverse_vectorIterator(_it + n));
 				}
 
+				difference_type operator - (const reverse_vectorIterator<T>& n) const
+				{
+					return (n.base() - _it);
+				}
+
+				reverse_vectorIterator<T>& operator-= (difference_type n)
+				{
+					_it += n;
+					return (*this);
+				}
+
+				// PRE/POST DECREMENT
 				reverse_vectorIterator<T>& operator--( void )
 				{
 					++_it;
@@ -258,20 +330,6 @@ namespace ft
 					_it++;
 					return (tmp);
 				}
-
-				reverse_vectorIterator<T>& operator-= (difference_type n)
-				{
-					return (_it += n);
-				}
-
-				pointer operator->() const
-				{
-					return (_it->a);
-				}
-
-				reference operator[] (difference_type n) const
-				{
-					return (_it - n - 1);
-				}
 		};
 }
+
