@@ -3,3 +3,4 @@
 *.swo
 compare_containers
 containers_test/
+output
