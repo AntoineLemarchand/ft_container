@@ -220,62 +220,56 @@ void	testMap(int termWidth)
 	//assertLine("get_allocator", 42, 4);
 }
 
-//#include "../includes/vector/containers_test/srcs/base.hpp"
-#include "../containers_test/srcs/vector/common.hpp"
+#include "../containers_test/srcs/stack/common.hpp"
 
-#define TESTED_TYPE foo<int>
+#define TESTED_TYPE int
+#define t_stack_ TESTED_NAMESPACE::stack<TESTED_TYPE>
+typedef t_stack_::container_type container_type;
 
-template <typename Ite_1, typename Ite_2>
-void ft_eq_ope(const Ite_1 &first, const Ite_2 &second, const bool redo = 1)
+template <class T_STACK>
+void	cmp(const T_STACK &lhs, const T_STACK &rhs)
 {
-	std::cout << (first < second) << std::endl;
-	std::cout << (first <= second) << std::endl;
-	std::cout << (first > second) << std::endl;
-	std::cout << (first >= second) << std::endl;
-	if (redo)
-		ft_eq_ope(second, first, 0);
+	static int i = 0;
+
+	std::cout << "############### [" << i++ << "] ###############"  << std::endl;
+	std::cout << "eq: " << (lhs == rhs) << " | ne: " << (lhs != rhs) << std::endl;
+	std::cout << "lt: " << (lhs <  rhs) << " | le: " << (lhs <= rhs) << std::endl;
+	std::cout << "gt: " << (lhs >  rhs) << " | ge: " << (lhs >= rhs) << std::endl;
 }
 
 int		main(void)
 {
-	const int size = 5;
-	TESTED_NAMESPACE::vector<TESTED_TYPE> vct(size);
-	TESTED_NAMESPACE::vector<TESTED_TYPE>::reverse_iterator it_0(vct.rbegin());
-	TESTED_NAMESPACE::vector<TESTED_TYPE>::reverse_iterator it_1(vct.rend());
-	TESTED_NAMESPACE::vector<TESTED_TYPE>::reverse_iterator it_mid;
+	container_type	ctnr;
 
-	TESTED_NAMESPACE::vector<TESTED_TYPE>::const_reverse_iterator cit_0 = vct.rbegin();
-	TESTED_NAMESPACE::vector<TESTED_TYPE>::const_reverse_iterator cit_1;
-	TESTED_NAMESPACE::vector<TESTED_TYPE>::const_reverse_iterator cit_mid;
+	ctnr.push_back(21);
+	ctnr.push_back(42);
+	ctnr.push_back(1337);
+	ctnr.push_back(19);
+	ctnr.push_back(0);
+	ctnr.push_back(183792);
 
-	for (int i = size; it_0 != it_1; --i)
-		*it_0++ = i;
-	printSize(vct, 1);
-	it_0 = vct.rbegin();
-	cit_1 = vct.rend();
-	it_mid = it_0 + 3;
-	cit_mid = it_0 + 3; cit_mid = cit_0 + 3; cit_mid = it_mid;
+	t_stack_	stck(ctnr);
+	t_stack_	stck2(ctnr);
 
-	std::cout << std::boolalpha;
-	std::cout << ((it_0 + 3 == cit_0 + 3) && (cit_0 + 3 == it_mid)) << std::endl;
+	cmp(stck, stck);  // 0
+	cmp(stck, stck2); // 1
 
-	std::cout << "\t\tft_eq_ope:" << std::endl;
-	// regular it
-	ft_eq_ope(it_0 + 3, it_mid);
-	ft_eq_ope(it_0, it_1);
-	ft_eq_ope(it_1 - 3, it_mid);
-	// const it
-	ft_eq_ope(cit_0 + 3, cit_mid);
-	ft_eq_ope(cit_0, cit_1);
-	ft_eq_ope(cit_1 - 3, cit_mid);
-	// both it
-	ft_eq_ope(it_0 + 3, cit_mid);
-	ft_eq_ope(it_mid, cit_0 + 3);
-	ft_eq_ope(it_0, cit_1);
-	ft_eq_ope(it_1, cit_0);
-	ft_eq_ope(it_1 - 3, cit_mid);
-	ft_eq_ope(it_mid, cit_1 - 3);
+	stck2.push(60);
+	stck2.push(61);
+	stck2.push(62);
 
+	cmp(stck, stck2); // 2
+	cmp(stck2, stck); // 3
+
+	stck.push(42);
+
+	cmp(stck, stck2); // 4
+	cmp(stck2, stck); // 5
+
+	stck.push(100);
+
+	cmp(stck, stck2); // 6
+	cmp(stck2, stck); // 7
 	return (0);
 }
 
