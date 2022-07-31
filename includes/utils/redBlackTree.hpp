@@ -92,29 +92,71 @@ namespace ft
 				}
 
 				// classic BST insert
-				Node*	tree_insert(Node* root, value_type val)
+				Node*	tree_insert(Node* root, Node* prev, value_type val)
 				{
 					if (!root)
 					{
-						initNode(root, val);
+						initNode(root, prev,val);
 						return (root);
 					}
 					else if (val > root->val)
-						root->right = Insert(root->right, val);
-					else 
-						root->left = Insert(root->left, val);
+						root->right = tree_insert(root->right, root, val);
+					else if (val < root->val)
+						root->left = tree_insert(root->left, root, val);
+					else
+						throw new IllegalArgumentException("BST: Duplicate key: " + val->first);
 					return (root);
 				}
 
-				void insertNode(Node* newNode)
+				// red black tree twist after insert
+				void	RBT_fixInsert(Node* newNode)
 				{
-					tree_insert(_root, newNode)
-					if (newNode == _root)
-						newNode->color = 1;
+					Node* parent = newNode->parent;
+
+					if (newNode == _root || parent = _root)
+					{
+						_root->color = black;
+						return;
+					}
+					if (parent->color == black)
+						return;
+					Node* gParent = parent->parent;
+					Node* uncle = (newNode == parent->right) ?
+						gParent->left : gParent->right;
+					if (uncle != NULL && uncle->color == red)
+					{
+						gParent->color = red;
+						parent->color = black;
+						uncle->color = black;
+						fix_redBlackTree(gParent);
+					}
+					else if (parent == gParent->left)
+					{
+						if (newnode == parent->right)
+						{
+							leftRotate(parent);
+							parent = newNode;
+						}
+						rightRotate(gParent);
+						parent->color = black;
+						gParent->color = red;
+					}
+					else
+					{
+						if (newNode == parent->left)
+						{
+							rightRotate(parent);
+							parent = newNode;
+						}
+						leftRotate(gParent);
+						parent->color = black;
+						gParent->color = red;
+					}
 				}
-				
-				void	deleteNode(int key)
+
+				void insertNode(value_type val)
 				{
+					fix_redBlackTree(tree_insert(_root, NULL, val));
 				}
 		}
 }
