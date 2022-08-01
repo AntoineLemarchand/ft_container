@@ -1,6 +1,6 @@
 #pragma once
 
-#include "treeUtils.hpp"
+#include "../utils/redBlackTree.hpp"
 
 namespace ft
 {
@@ -8,7 +8,7 @@ namespace ft
 		class mapIterator
 		{
 			private:
-				mapNode<T> *_current;
+				Node<T>* _current;
 			public:
 				typedef	typename iterator_traits<T*>::difference_type	difference_type;
 				typedef	typename iterator_traits<T*>::value_type		value_type;
@@ -58,10 +58,7 @@ namespace ft
 					return (&_current->val);
 				}
 
-				reference operator [] ( const std::size_t n )
-				{
-					return ()
-				}
+				reference operator [] ( const std::size_t n );
 
 				// OPERATIONS
 

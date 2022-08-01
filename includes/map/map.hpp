@@ -1,12 +1,12 @@
 #pragma once
 
 #include "mapIterator.hpp"
-#include "redBlackTree.hpp"
+#include "../utils/redBlackTree.hpp"
 
 namespace ft
 {
-	template < class Key, class T, class Compare = less<Key>,
-			 class Alloc = allocator<pair<const Key,T> > > class map
+	template < class Key, class T, class Compare = std::less<Key>,
+			 class Alloc = std::allocator<pair<const Key,T> > > class map
 			 {
 				 public:
 					 // MEMBER TYPES

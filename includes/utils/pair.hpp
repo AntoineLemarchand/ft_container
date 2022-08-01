@@ -35,7 +35,7 @@ namespace ft
 					first = other.first;
 					second = other.second;
 			}
-		}
+		};
 
 	template< class T1, class T2 >
 		std::pair<T1,T2> make_pair( T1 t, T2 u )
@@ -54,7 +54,7 @@ namespace ft
 		bool operator != ( const std::pair<T1,T2>& lhs,
 				const std::pair<T1,T2>& rhs )
 		{
-			return (!(lhs == rhs))
+			return (!(lhs == rhs));
 		}
 
 	template< class T1, class T2 >

@@ -1,22 +1,37 @@
 #pragma once
+#include "pair.hpp"
+#include <stdexcept>
 
 namespace ft
 {
-	template<class Key, class T>
+	template<class Pair>
 		struct Node
 		{
 			struct Node*	parent;
 			struct Node*	left;
 			struct Node*	right;
-			pair<Key, T>	val;
-			enum { red, black } color;
+			Pair			val;
+			bool			color;
 		};
 
 	template<class Key, class T, class comp>
 		class redBlackTree
 		{
 			private:
-				Node<Key, T>*	_root;
+				std::allocator<Node<pair<Key, T> > >	_alloc;
+				Node<pair<Key, T> >*					_root;
+			public:
+				typedef	pair<Key, T> value_type;
+				typedef	Node<value_type> node_type;
+
+				redBlackTree() { _root = NULL; }
+				redBlackTree( const redBlackTree& tr) { *this = tr; }
+				redBlackTree& operator= ( const redBlackTree& tr)
+				{
+					if (this != &tr)
+						_root = tr.getRoot();
+					return (*this);
+				}
 
 				// x = node to put left of y
 				// y = node to put on top
@@ -25,9 +40,9 @@ namespace ft
 				// the new parent of y is x old parent (back up)
 				// if x was root, update _root
 				// put x on y left
-				void	leftRotate(Node* x)
+				void	leftRotate(node_type* x)
 				{
-					Node* y = x->right;
+					node_type* y = x->right;
 
 					x->right = y->left;
 					if (y->left != NULL)
@@ -51,9 +66,9 @@ namespace ft
 				// the new parent of x is y old parent (back up)
 				// if y was root, update _root
 				// put y on x right
-				void	rightRotate(Node* y)
+				void	rightRotate(node_type* y)
 				{
-					Node* x = y->left;
+					node_type* x = y->left;
 
 					y->left = x->right;
 					if (x->right != NULL)
@@ -70,19 +85,20 @@ namespace ft
 					y->parent = x;
 				}
 
-			public:
-				typedef	typename	pair<Key, T> value_type;
-
-				void	initNode(Node* node, Node* parent, value_type val)
+				void	initNode(node_type* node, node_type* parent,
+						value_type val)
 				{
-					node->val = val;
-					node->parent = parent;
-					node->left = NULL;
-					node->right = NULL;
-					node->color = red;
+					node_type tmp;
+					tmp.val = val;
+					tmp.parent = parent;
+					tmp.left = NULL;
+					tmp.right = NULL;
+					tmp.color = 0;
+					node = _alloc.allocate(1);
+					_alloc.construct(node, tmp);
 				}
 
-				Node*	searchTree(Node* root, Key key)
+				node_type*	searchTree(node_type* root, Key key)
 				{
 					if (root == NULL || root->val.first == key)
 						return (root);
@@ -92,7 +108,8 @@ namespace ft
 				}
 
 				// classic BST insert
-				Node*	tree_insert(Node* root, Node* prev, value_type val)
+				node_type*	tree_insert(node_type* root, node_type* prev,
+						value_type val)
 				{
 					if (!root)
 					{
@@ -104,42 +121,42 @@ namespace ft
 					else if (val < root->val)
 						root->left = tree_insert(root->left, root, val);
 					else
-						throw new IllegalArgumentException("BST: Duplicate key: " + val->first);
+						throw std::invalid_argument("BST: Duplicate key: " + val->first);
 					return (root);
 				}
 
 				// red black tree twist after insert
-				void	RBT_fixInsert(Node* newNode)
+				void	RBT_fixInsert(node_type* newNode)
 				{
-					Node* parent = newNode->parent;
+					node_type* parent = newNode->parent;
 
-					if (newNode == _root || parent = _root)
+					if (newNode == _root || parent == _root)
 					{
-						_root->color = black;
+						_root->color = 1;
 						return;
 					}
-					if (parent->color == black)
+					if (parent->color == 1)
 						return;
-					Node* gParent = parent->parent;
-					Node* uncle = (newNode == parent->right) ?
+					node_type* gParent = parent->parent;
+					node_type* uncle = (newNode == parent->right) ?
 						gParent->left : gParent->right;
-					if (uncle != NULL && uncle->color == red)
+					if (uncle != NULL && uncle->color == 0)
 					{
-						gParent->color = red;
-						parent->color = black;
-						uncle->color = black;
+						gParent->color = 0;
+						parent->color = 1;
+						uncle->color = 1;
 						fix_redBlackTree(gParent);
 					}
 					else if (parent == gParent->left)
 					{
-						if (newnode == parent->right)
+						if (newNode == parent->right)
 						{
 							leftRotate(parent);
 							parent = newNode;
 						}
 						rightRotate(gParent);
-						parent->color = black;
-						gParent->color = red;
+						parent->color = 1;
+						gParent->color = 0;
 					}
 					else
 					{
@@ -149,8 +166,8 @@ namespace ft
 							parent = newNode;
 						}
 						leftRotate(gParent);
-						parent->color = black;
-						gParent->color = red;
+						parent->color = 1;
+						gParent->color = 0;
 					}
 				}
 
@@ -158,5 +175,5 @@ namespace ft
 				{
 					fix_redBlackTree(tree_insert(_root, NULL, val));
 				}
-		}
+		};
 }
