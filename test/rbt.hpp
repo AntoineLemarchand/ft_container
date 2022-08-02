@@ -22,7 +22,7 @@ namespace ft
 				color = 0;
 			}
 
-			Node(Pair& vl)
+			Node(const Pair& vl)
 			{
 				parent = NULL;
 				left = NULL;
@@ -63,16 +63,16 @@ namespace ft
 
 				~redBlackTree()
 				{
-					delNode(_root);
+					clearNode(_root);
 				}
 
 
-				void	delNode(node_type* node)
+				void	clearNode(node_type* node)
 				{
 					if (node && node->left)
-						delNode(node->left);
+						clearNode(node->left);
 					if (node && node->right)
-						delNode(node->right);
+						clearNode(node->right);
 					if (node)
 					{
 						_alloc.destroy(node);
@@ -80,17 +80,42 @@ namespace ft
 					}
 				}
 
-				void	leftRotate(node_type* x)
+				void	leftRotate(node_type* l)
 				{
+					node_type*	r;
+
+					r = l->right;
+					if (l->parent && l->parent->right == l)
+						l->parent->right = r;
+					else if (l->parent)
+						l->parent->left = r;
+					else
+						_root = r;
+					r->parent = l->parent;
+					l->right = r->left;
+					if (l->right)
+						l->right->parent = l;
+					r->left = l;
+					l->parent = r;
 				}
 
-				void	rightRotate(node_type* y)
+				void	rightRotate(node_type* r)
 				{
-					node_type* x = y->left;
-					node_type* T2 = x->right;
+					node_type*	l;
 
-					x->right = y;
-					y->left = T2;
+					l = r->left;
+					if (r->parent && r->parent->right == r)
+						r->parent->right = l;
+					else if (r->parent)
+						r->parent->left = l;
+					else
+						_root = l;
+					l->parent = r->parent;
+					r->left = l->right;
+					if (r->left)
+						r->left->parent = r;
+					l->right = r;
+					r->parent = l;
 				}
 
 				void	initNode(node_type** node, node_type* parent,
@@ -127,57 +152,69 @@ namespace ft
 							_root = root;
 					}
 					else if (val.first > root->val.first)
-					{
 						root->right = tree_insert(root->right, root, val);
-						return (root->right);
-					}
 					else if (val.first < root->val.first)
-					{
 						root->left = tree_insert(root->left, root, val);
-						return (root->left);
-					}
 					else
-						throw std::invalid_argument("BST: Duplicate key: " + val.first);
+						throw std::invalid_argument("BST: Duplicate key: " +
+								val.first);
 					return (root);
 				}
 
 				// red black tree twist after insert
-				void	RBT_fixInsert(node_type* newNode)
+				void	RBT_fixInsert(node_type* N)
 				{
-					while (newNode->parent != NULL && newNode->parent != _root
-							&& newNode->parent->color != 1)
-					{
-						node_type*	uncle = (newNode->parent == newNode->parent->parent->left) ? newNode->parent->parent->right : newNode->parent->parent->left;
-						bool	parentSide = (newNode->parent->parent->right == newNode->parent);
-						bool	newNodeSide = (newNode->parent->right == newNode);
+					node_type* P = N->parent;
+					node_type* G;
+					node_type* U;
 
-						if (uncle && uncle->color == 0)
-							newNode = newNode->parent->parent;
-						else
-						{
-							if (parentSide != newNodeSide)
-							{
-								if (newNodeSide == 1)
-									rightRotate(newNode->parent);
-								else
-									leftRotate(newNode->parent);
-								newNode = newNode->parent;
-							}
-							if (parentSide == 1)
-								rightRotate(newNode->parent->parent);
-							else
-								leftRotate(newNode->parent->parent);
-
-						}
-					}
 					_root->color = 1;
+					while (P)
+					{
+						if (!P || P->color == 1)
+							return;
+						if ((G = P->parent) == NULL)
+						{
+							P->color = 1;
+							return;
+						}
+						U = (G->right == P) ? G->left : G->right;
+						if (!U || U->color == 1)
+						{
+							bool dir = (N == P->right);
+							if (N == P->right && P == G->left)
+							{
+								leftRotate(P);
+								N = P;
+								P = G->right;
+							}
+							else if (N == P->left && P == G->right)
+							{
+								rightRotate(P);
+								N = P;
+								P = G->left;
+							}
+							if (N == P->left)
+								rightRotate(G);
+							else
+								leftRotate(G);
+							P->color = 1;
+							G->color = 0;
+							return;
+						}
+						P->color = 1;
+						U->color = 1;
+						G->color = 0;
+						N = G;
+						P = N->parent;
+					}
 				}
 
 				void insertNode(value_type val)
 				{
 					node_type* newNode = tree_insert(_root, NULL, val);
 					_size++;
-					RBT_fixInsert(newNode);
+					RBT_fixInsert(searchTree(_root, val.first));
 				}
 
 				node_type* getRoot( void )
