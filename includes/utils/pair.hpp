@@ -19,7 +19,15 @@ namespace ft
 				pair( const pair<U, V>& pr ): first(pr.first), second(pr.second)
 				{}
 
-			pair& operator=( const pair& other );
+			pair& operator = ( const pair& other )
+			{
+				if (this != &other)
+				{
+					first = other.first;
+					second = other.second;
+				}
+				return (*this);
+			}
 		};
 
 	template< class T1, class T2 >

@@ -1,9 +1,17 @@
 #pragma once
 
-#include "../utils/redBlackTree.hpp"
-
 namespace ft
 {
+	template < class T >
+	struct Node
+	{
+		struct Node*	parent;
+		struct Node*	left;
+		struct Node*	right;
+		T*				val;
+		bool			color;
+	};
+
 	template < class T >
 		class mapIterator
 		{
@@ -27,7 +35,7 @@ namespace ft
 					*this = it;
 				}
 
-				mapIterator( const Node<T>* node)
+				mapIterator( Node<T>* node )
 				{
 					_current = node;
 				}
@@ -46,23 +54,23 @@ namespace ft
 				// COMPARISON
 				bool	operator == (const mapIterator<const value_type>& it) const
 				{
-					return (_current->val == *it);
+					return (*_current->val == *it);
 				}
 
 				bool	operator != (const mapIterator<const value_type>& it) const
 				{
-					return (_current != it._current);
+					return (!(*this == it));
 				}
 
 				// DEREFERENCING
 				reference operator * ( void ) const
 				{
-					return (_current->val);
+					return (*_current->val);
 				}
 
 				pointer operator -> ( void ) const
 				{
-					return (&_current->val);
+					return (_current->val);
 				}
 
 				// OPERATIONS
