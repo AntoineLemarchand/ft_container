@@ -27,24 +27,31 @@ namespace ft
 					*this = it;
 				}
 
+				mapIterator( const Node<T>* node)
+				{
+					_current = node;
+				}
+
 				// DESTRUCTOR
 				~mapIterator( void ) {};
 
 				// OPERATOR OVERLOAD
 				mapIterator& operator = ( const mapIterator& it)
 				{
-					_current = it.current;
+					if (this != &it)
+						_current = it._current;
+					return (*this);
 				}
 
 				// COMPARISON
 				bool	operator == (const mapIterator<const value_type>& it) const
 				{
-					return (_current == it.current);
+					return (_current->val == *it);
 				}
 
 				bool	operator != (const mapIterator<const value_type>& it) const
 				{
-					return (_current != it.current);
+					return (_current != it._current);
 				}
 
 				// DEREFERENCING
@@ -58,16 +65,179 @@ namespace ft
 					return (&_current->val);
 				}
 
-				reference operator [] ( const std::size_t n );
-
 				// OPERATIONS
 
 				// PRE/POST INCREMENT
-				mapIterator& operator ++ ( void );
-				mapIterator operator ++ ( int );
+				mapIterator operator ++ ( void )
+				{
+					mapIterator	tmp(*this);
+
+					if (_current->parent && _current->val > _current->parent->val)
+						_current = _current->parent;
+					else if (_current->right)
+					{
+						_current = _current->right;
+						while (_current->left)
+							_current = _current->left;
+					}
+					return (tmp);
+				}
+
+				mapIterator& operator ++ ( int )
+				{
+					if (_current->parent && *_current > *_current->parent)
+						_current = _current->parent;
+					else if (_current->right)
+					{
+						_current = _current->right;
+						while (_current->left)
+							_current = _current->left;
+					}
+					return(_current);
+				}
 
 				// PRE/POST DECREMENT
-				mapIterator operator -- ( int );
-				mapIterator& operator -- ( void );
+				mapIterator& operator -- ( int )
+				{
+					mapIterator	tmp(*this);
+
+					if (_current->parent && *_current < *_current->parent)
+						_current = _current->parent;
+					else if (_current->left)
+					{
+						_current = _current->left;
+						while (_current->right)
+							_current = _current->right;
+					}
+					return (tmp);
+				}
+
+				mapIterator operator -- ( void )
+				{
+					if (_current->parent && *_current < *_current->parent)
+						_current = _current->parent;
+					else if (_current->left)
+					{
+						_current = _current->left;
+						while (_current->right)
+							_current = _current->right;
+					}
+					return(_current);
+				}
+		};
+
+	template < class T >
+		class reverse_mapIterator
+		{
+			private:
+				mapIterator<T>	_it;
+			public:
+				typedef vectorIterator<T> iterator_type;
+				typedef typename iterator_traits<vectorIterator<T> >::iterator_category iterator_category;
+				typedef typename iterator_traits<vectorIterator<T> >::value_type value_type;
+				typedef typename iterator_traits<vectorIterator<T> >::difference_type difference_type;
+				typedef typename iterator_traits<vectorIterator<T> >::pointer pointer;
+				typedef typename iterator_traits<vectorIterator<T> >::reference reference;
+
+				reverse_mapIterator( void )
+				{
+					_it = mapIterator<T>();
+				}
+
+				explicit reverse_mapIterator(iterator_type it)
+				{
+					_it = it;
+				}
+
+				template <class Iter>
+					reverse_mapIterator<T> (const reverse_mapIterator<Iter>& rev_it)
+					{
+						_it = rev_it.base();
+					}
+
+				reverse_mapIterator<T>& operator = ( const reverse_mapIterator<T>& rit)
+				{
+					if (this != &rit)
+						_it = rit.base();
+					return (*this);
+				}
+
+				// DEREFERENCE
+				mapIterator<T> base() const
+				{
+					return (_it);
+				}
+
+				reference operator * ( void ) const
+				{
+					mapIterator<T> retVal(_it);
+					retVal--;
+
+					return (*retVal);
+				}
+
+				pointer operator->() const
+				{
+					return (&(**this));
+				}
+
+				// COMPARISON
+				bool	operator == (const reverse_mapIterator<const value_type>& it) const
+				{
+					return (_it == it.base());
+				}
+
+				bool	operator != (const reverse_mapIterator<const value_type>& it) const
+				{
+					return (_it != it.base());
+				}
+
+				bool	operator < (const reverse_mapIterator<const value_type>& it) const
+				{
+					return (_it > it.base());
+				}
+
+				bool	operator <= (const reverse_mapIterator<const value_type>& it) const
+				{
+					return (_it >= it.base());
+				}
+
+				bool	operator > (const reverse_mapIterator<const value_type>& it) const
+				{
+					return (_it < it.base());
+				}
+
+				bool	operator >= (const reverse_mapIterator<const value_type>& it) const
+				{
+					return (_it <= it.base());
+				}
+
+				// PRE/POST INCREMENT
+				reverse_mapIterator<T>& operator++( void )
+				{
+					--_it;
+					return (*this);
+				}
+
+				reverse_mapIterator<T>  operator++(int)
+				{
+					reverse_mapIterator<T> tmp(*this);
+					_it--;
+					return (tmp);
+				}
+
+				// PRE/POST DECREMENT
+				reverse_mapIterator<T>& operator--( void )
+				{
+					++_it;
+					return (*this);
+				}
+
+				reverse_mapIterator<T>  operator--(int)
+				{
+					reverse_mapIterator<T> tmp(*this);
+					_it++;
+					return (tmp);
+				}
 		};
 }
