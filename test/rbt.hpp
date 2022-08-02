@@ -160,13 +160,13 @@ namespace ft
 								val.first);
 					return (root);
 				}
-
-				// red black tree twist after insert
+//source
+//https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
 				void	RBT_fixInsert(node_type* N)
 				{
-					node_type* P = N->parent;
-					node_type* G;
-					node_type* U;
+					node_type* P = N->parent; //parent
+					node_type* G; //grandparent
+					node_type* U; // uncle
 
 					_root->color = 1;
 					while (P)
@@ -186,13 +186,13 @@ namespace ft
 							{
 								leftRotate(P);
 								N = P;
-								P = G->right;
+								P = G->left;
 							}
 							else if (N == P->left && P == G->right)
 							{
 								rightRotate(P);
 								N = P;
-								P = G->left;
+								P = G->right;
 							}
 							if (N == P->left)
 								rightRotate(G);
@@ -210,11 +210,64 @@ namespace ft
 					}
 				}
 
+				void	RBT_delNode(node_type* N)
+				{
+					node_type* P = N->parent; // parent
+					node_type* S; // sibling
+					node_type* C; // close nephew
+					node_type* D; // distant nephew
+				}
+
 				void insertNode(value_type val)
 				{
 					node_type* newNode = tree_insert(_root, NULL, val);
 					_size++;
 					RBT_fixInsert(searchTree(_root, val.first));
+				}
+
+				void shiftNode(node_type* to, node_type* from)
+				{
+					std::cout << "shifting " << to->val.first << " with " << from->val.first << std::endl;
+					if (from->parent)
+						if (from->parent->right == from)
+							from->parent->right = NULL;
+						else
+							from->parent->left = NULL;
+					to->val = from->val;
+					_alloc.destroy(from);
+					_alloc.deallocate(from, 1);
+				}
+
+				node_type* getMinimum(node_type* N)
+				{
+					while (N->left)
+						N = N->left;
+					return (N);
+				}
+
+//using
+//https://medium.com/analytics-vidhya/deletion-in-red-black-rb-tree-92301e1474ea
+				void deleteNode(node_type* N)
+				{
+					bool	original_color = N->color;
+					// if node is red, perform a classic bst delete
+					if (N->right && N->left)
+						shiftNode(N, getMinimum(N->right));
+					else if (N->right)
+						shiftNode(N, N->right);
+					else if (N->left)
+						shiftNode(N, N->left);
+					else
+					{
+						if (!N->parent)
+							_root = NULL;
+						if (N->parent->left == N)
+							N->parent->left = NULL;
+						else
+							N->parent->right = NULL;
+						_alloc.destroy(N);
+						_alloc.deallocate(N, 1);
+					}
 				}
 
 				node_type* getRoot( void )

@@ -21,8 +21,16 @@ void print2DUtil(ft::Node<std::pair<int, int> > *root, int space)
 		std::cout<<" ";
 	if (root->parent)
 		std::cout<< (root->parent && root->parent->left == root ? "┗" : "┏");
-		std::cout << (root->color ? "\033[1;40m" : "\033[1;41m") <<root->val.first << "\033[0m"<< "parent: "
-		<< ((root->parent != NULL) ? root->parent->val.first : -1) << std::endl;
+	std::cout << (root->color ? "\033[1;40m" : "\033[1;41m") <<root->val.first
+		<< "\033[0m";
+	std::cout << "[";
+	if (root->parent)
+		std::cout << " P: " <<  root->parent->val.first;
+	if (root->left)
+		std::cout << " L: " << root->left->val.first;
+	if (root->right)
+		std::cout<< " R: " <<root->right->val.first;
+	std::cout << " ]" << std::endl;
 
 	print2DUtil(root->left, space);
 }
@@ -41,20 +49,13 @@ int main ( void )
 	ft::redBlackTree<int, int> tr;
 
 	int i = 0;
-
-	   for (std::string line; std::getline(std::cin, line);) {
-	   try
-	   {
-	   tr.insertNode(std::make_pair(atoi(line.c_str()), i));
-	   }
-	   catch (const std::invalid_argument& e)
-	   {
-	   std::cout << e.what() << std::endl;
-	   }
-	   std::cout << tr.getRoot()->val.first << " - " << tr.getSize() << std::endl;
-	   print2D(tr.getRoot());
-	   i++;
-	   }
+	for (std::string line; std::getline(std::cin, line);) {
+		if (line[0] == 'd')
+			tr.deleteNode(tr.searchTree(tr.getRoot(), atoi(&line[1])));
+		else
+			tr.insertNode(std::make_pair(atoi(line.c_str()), i));
+		print2D(tr.getRoot());
+		i++;
+	}
 	return 0;
-
 }
