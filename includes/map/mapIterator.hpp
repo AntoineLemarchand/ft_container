@@ -93,38 +93,40 @@ namespace ft
 				// PRE/POST INCREMENT
 				mapIterator operator ++ ( void )
 				{
-					mapIterator	tmp(*this);
-					const Node*	N = tmp.getCurrent();
-
-					if (N->right)
-					{
-						N = N->right;
-						while (N->left)
-							N = N->left;
-					}
-					else if (N->parent)
-					{
-						if (N->parent->left == N)
-							N = N->parent;
-						else
-							N = N->parent->parent;
-					}
-					return (tmp);
-				}
-
-				mapIterator& operator ++ ( int )
-				{
-					if (_current->parent
-							&& *static_cast<T>(_current) >
-							*static_cast<T>(_current->parent))
-						_current = _current->parent;
-					else if (_current->right)
+					if (_current->right)
 					{
 						_current = _current->right;
 						while (_current->left)
 							_current = _current->left;
 					}
-					return(_current);
+					else if (_current->parent)
+					{
+						if (_current->parent->left == _current)
+							_current = _current->parent;
+						else
+							_current = _current->parent->parent;
+					}
+					return(*this);
+				}
+
+				mapIterator& operator ++ ( int )
+				{
+					mapIterator	tmp(*this);
+
+					if (_current->right)
+					{
+						_current = _current->right;
+						while (_current->left)
+							_current = _current->left;
+					}
+					else if (_current->parent)
+					{
+						if (_current->parent->left == _current)
+							_current = _current->parent;
+						else
+							_current = _current->parent->parent;
+					}
+					return (tmp);
 				}
 
 				// PRE/POST DECREMENT

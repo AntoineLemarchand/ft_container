@@ -11,7 +11,7 @@ namespace ft
 			struct Node*	parent;
 			struct Node*	left;
 			struct Node*	right;
-			Pair&			val;
+			Pair			val;
 			bool			color;
 
 			Node()

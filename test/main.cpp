@@ -44,11 +44,20 @@ void print2D(ft::Node<std::pair<int, int> > *root)
 	std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 }
 
+#include <list>
 int main ( void )
 {
 	ft::redBlackTree<int, int> tr;
 
 	int i = 0;
+	std::list<std::pair<int, int> > lst;
+	unsigned int lst_size = 10;
+	for (unsigned int i = 0; i < lst_size; ++i)
+		lst.push_back(std::pair<int, int>(i + 1, (i + 1) * 3));
+	for (std::list<std::pair<int, int> >::iterator it = lst.begin(); it !=lst.end(); it++)
+		tr.insertNode(*it);
+	print2D(tr.getRoot());
+	/*
 	for (std::string line; std::getline(std::cin, line);) {
 		if (line[0] == 'd')
 			tr.deleteNode(tr.searchTree(tr.getRoot(), atoi(&line[1])));
@@ -57,5 +66,6 @@ int main ( void )
 		print2D(tr.getRoot());
 		i++;
 	}
+	*/
 	return 0;
 }
