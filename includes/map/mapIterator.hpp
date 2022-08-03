@@ -1,16 +1,21 @@
 #pragma once
 
-#include "../utils/redBlackTree.hpp"
-
 namespace ft
 {
+	struct Node
+	{
+		struct Node*	parent;
+		struct Node*	left;
+		struct Node*	right;
+		void*			val;
+		int				color;
+	};
+
 	template < class T >
 		class mapIterator
 		{
 			private:
-				typedef Node<T> node_type;
-				node_type*	_currentNode;
-				T*			_current;	
+				const Node* _current;
 			public:
 				typedef	typename iterator_traits<T*>::difference_type	difference_type;
 				typedef	typename iterator_traits<T*>::value_type		value_type;
@@ -18,57 +23,69 @@ namespace ft
 				typedef	typename iterator_traits<T*>::reference			reference;
 				typedef typename iterator_traits<T*>::iterator_category	iterator_category;
 
+				operator mapIterator<const T>() const
+				{
+					return (mapIterator<const T>(this->_current));
+				}
 				// CONSTRUCTORS
 				mapIterator( void )
 				{
-					_currentNode = NULL;
 					_current = NULL;
 				}
 
-				mapIterator( const mapIterator<value_type>& it)
+				mapIterator( const mapIterator& it)
 				{
 					*this = it;
 				}
 
-				mapIterator( const node_type* node)
+				mapIterator( const Node& node )
 				{
-					_currentNode = node;
+					_current = &node;
 				}
 
 				// DESTRUCTOR
-				~mapIterator( void ) {};
+				~mapIterator( void )
+				{
+				};
 
 				// OPERATOR OVERLOAD
 				mapIterator& operator = ( const mapIterator& it)
 				{
 					if (this != &it)
-					{
-						_currentNode = it._current;
-						_current = NULL;
-					}
+						_current = it.getCurrent();
 					return (*this);
 				}
 
 				// COMPARISON
 				bool	operator == (const mapIterator<const value_type>& it) const
 				{
-					return (_current == *it);
+					return (_current == it.getCurrent());
 				}
 
 				bool	operator != (const mapIterator<const value_type>& it) const
 				{
-					return (_current != *it);
+					return (!(*this == it));
+				}
+
+				bool	operator == (const mapIterator<value_type>& it)
+				{
+					return (*static_cast<value_type*>(_current->val) == *it);
+				}
+
+				bool	operator != (const mapIterator<value_type>& it)
+				{
+					return (!(*this == it));
 				}
 
 				// DEREFERENCING
 				reference operator * ( void ) const
 				{
-					return (_current);
+					return (*(static_cast<value_type*>(_current->val)));
 				}
 
 				pointer operator -> ( void ) const
 				{
-					return (&_current);
+					return (static_cast<value_type*>(_current->val));
 				}
 
 				// OPERATIONS
@@ -77,30 +94,37 @@ namespace ft
 				mapIterator operator ++ ( void )
 				{
 					mapIterator	tmp(*this);
+					const Node*	N = tmp.getCurrent();
 
-					if (_currentNode->parent && _current->val > _current->parent->val)
-						_currentNode = _current->parent;
-					else if (_currentNode->right)
+					if (N->right)
 					{
-						_currentNode = _current->right;
-						while (_currentNode->left)
-							_currentNode = _current->left;
+						N = N->right;
+						while (N->left)
+							N = N->left;
 					}
-					_current = _currentNode->val;
-					return (_current);
+					else if (N->parent)
+					{
+						if (N->parent->left == N)
+							N = N->parent;
+						else
+							N = N->parent->parent;
+					}
+					return (tmp);
 				}
 
 				mapIterator& operator ++ ( int )
 				{
-					if (_currentNode->parent && *_current > *_current->parent)
-						_currentNode = _current->parent;
-					else if (_currentNode->right)
+					if (_current->parent
+							&& *static_cast<T>(_current) >
+							*static_cast<T>(_current->parent))
+						_current = _current->parent;
+					else if (_current->right)
 					{
-						_currentNode = _current->right;
-						while (_currentNode->left)
-							_currentNode = _current->left;
+						_current = _current->right;
+						while (_current->left)
+							_current = _current->left;
 					}
-					return(_currentNode);
+					return(_current);
 				}
 
 				// PRE/POST DECREMENT
@@ -108,28 +132,37 @@ namespace ft
 				{
 					mapIterator	tmp(*this);
 
-					if (_currentNode->parent && *_current < *_current->parent)
-						_currentNode = _current->parent;
-					else if (_currentNode->left)
+					if (_current->parent
+							&& *static_cast<T>(_current) <
+							*static_cast<T>(_current->parent))
+						_current = _current->parent;
+					else if (_current->left)
 					{
-						_currentNode = _current->left;
-						while (_currentNode->right)
-							_currentNode = _current->right;
+						_current = _current->left;
+						while (_current->right)
+							_current = _current->right;
 					}
 					return (tmp);
 				}
 
 				mapIterator operator -- ( void )
 				{
-					if (_currentNode->parent && *_current < *_current->parent)
-						_currentNode = _current->parent;
-					else if (_currentNode->left)
+					if (_current->parent
+							&& *static_cast<T>(_current) <
+							*static_cast<T>(_current->parent))
+						_current = _current->parent;
+					else if (_current->left)
 					{
-						_currentNode = _current->left;
-						while (_currentNode->right)
-							_currentNode = _current->right;
+						_current = _current->left;
+						while (_current->right)
+							_current = _current->right;
 					}
-					return(_currentNode);
+					return(_current);
+				}
+
+				const Node*	getCurrent() const
+				{
+					return (_current);
 				}
 		};
 
