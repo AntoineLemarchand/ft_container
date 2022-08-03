@@ -92,7 +92,7 @@ namespace	ft
 					{
 						clear();
 						reserve(x.size());
-						for (iterator it = x.begin();
+						for (const_iterator it = x.begin();
 								it < x.end(); it++)
 							push_back(*it);
 					}
@@ -100,14 +100,24 @@ namespace	ft
 				}
 
 				// ITERATORS
-				iterator begin() const
+				iterator begin()
 				{
 					return (iterator(_content));
 				}
 
-				iterator end() const
+				const_iterator begin() const
+				{
+					return (const_iterator(_content));
+				}
+
+				iterator end()
 				{
 					return (iterator(_content + _size));
+				}
+
+				const_iterator end() const
+				{
+					return (const_iterator(_content + _size));
 				}
 
 				reverse_iterator rbegin()
@@ -115,9 +125,19 @@ namespace	ft
 					return (reverse_iterator(end()));
 				}
 
+				const_reverse_iterator rbegin() const
+				{
+					return (const_reverse_iterator(end()));
+				}
+
 				reverse_iterator rend()
 				{
 					return (reverse_iterator(begin()));
+				}
+
+				const_reverse_iterator rend() const
+				{
+					return (const_reverse_iterator(begin()));
 				}
 
 				// CAPACITY

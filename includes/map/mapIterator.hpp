@@ -1,22 +1,16 @@
 #pragma once
 
+#include "../utils/redBlackTree.hpp"
+
 namespace ft
 {
-	template < class T >
-	struct Node
-	{
-		struct Node*	parent;
-		struct Node*	left;
-		struct Node*	right;
-		T*				val;
-		bool			color;
-	};
-
 	template < class T >
 		class mapIterator
 		{
 			private:
-				Node<T>* _current;
+				typedef Node<T> node_type;
+				node_type*	_currentNode;
+				T*			_current;	
 			public:
 				typedef	typename iterator_traits<T*>::difference_type	difference_type;
 				typedef	typename iterator_traits<T*>::value_type		value_type;
@@ -27,6 +21,7 @@ namespace ft
 				// CONSTRUCTORS
 				mapIterator( void )
 				{
+					_currentNode = NULL;
 					_current = NULL;
 				}
 
@@ -35,9 +30,9 @@ namespace ft
 					*this = it;
 				}
 
-				mapIterator( Node<T>* node )
+				mapIterator( const node_type* node)
 				{
-					_current = node;
+					_currentNode = node;
 				}
 
 				// DESTRUCTOR
@@ -47,30 +42,33 @@ namespace ft
 				mapIterator& operator = ( const mapIterator& it)
 				{
 					if (this != &it)
-						_current = it._current;
+					{
+						_currentNode = it._current;
+						_current = NULL;
+					}
 					return (*this);
 				}
 
 				// COMPARISON
 				bool	operator == (const mapIterator<const value_type>& it) const
 				{
-					return (*_current->val == *it);
+					return (_current == *it);
 				}
 
 				bool	operator != (const mapIterator<const value_type>& it) const
 				{
-					return (!(*this == it));
+					return (_current != *it);
 				}
 
 				// DEREFERENCING
 				reference operator * ( void ) const
 				{
-					return (*_current->val);
+					return (_current);
 				}
 
 				pointer operator -> ( void ) const
 				{
-					return (_current->val);
+					return (&_current);
 				}
 
 				// OPERATIONS
@@ -80,28 +78,29 @@ namespace ft
 				{
 					mapIterator	tmp(*this);
 
-					if (_current->parent && _current->val > _current->parent->val)
-						_current = _current->parent;
-					else if (_current->right)
+					if (_currentNode->parent && _current->val > _current->parent->val)
+						_currentNode = _current->parent;
+					else if (_currentNode->right)
 					{
-						_current = _current->right;
-						while (_current->left)
-							_current = _current->left;
+						_currentNode = _current->right;
+						while (_currentNode->left)
+							_currentNode = _current->left;
 					}
-					return (tmp);
+					_current = _currentNode->val;
+					return (_current);
 				}
 
 				mapIterator& operator ++ ( int )
 				{
-					if (_current->parent && *_current > *_current->parent)
-						_current = _current->parent;
-					else if (_current->right)
+					if (_currentNode->parent && *_current > *_current->parent)
+						_currentNode = _current->parent;
+					else if (_currentNode->right)
 					{
-						_current = _current->right;
-						while (_current->left)
-							_current = _current->left;
+						_currentNode = _current->right;
+						while (_currentNode->left)
+							_currentNode = _current->left;
 					}
-					return(_current);
+					return(_currentNode);
 				}
 
 				// PRE/POST DECREMENT
@@ -109,28 +108,28 @@ namespace ft
 				{
 					mapIterator	tmp(*this);
 
-					if (_current->parent && *_current < *_current->parent)
-						_current = _current->parent;
-					else if (_current->left)
+					if (_currentNode->parent && *_current < *_current->parent)
+						_currentNode = _current->parent;
+					else if (_currentNode->left)
 					{
-						_current = _current->left;
-						while (_current->right)
-							_current = _current->right;
+						_currentNode = _current->left;
+						while (_currentNode->right)
+							_currentNode = _current->right;
 					}
 					return (tmp);
 				}
 
 				mapIterator operator -- ( void )
 				{
-					if (_current->parent && *_current < *_current->parent)
-						_current = _current->parent;
-					else if (_current->left)
+					if (_currentNode->parent && *_current < *_current->parent)
+						_currentNode = _current->parent;
+					else if (_currentNode->left)
 					{
-						_current = _current->left;
-						while (_current->right)
-							_current = _current->right;
+						_currentNode = _current->left;
+						while (_currentNode->right)
+							_currentNode = _current->right;
 					}
-					return(_current);
+					return(_currentNode);
 				}
 		};
 

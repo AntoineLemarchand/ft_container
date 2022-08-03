@@ -24,21 +24,24 @@ namespace ft
 					_pointer = NULL;
 				}
 
-				vectorIterator( const vectorIterator<value_type>& it)
-				{
-					_pointer = &(*it);
-				}
+				vectorIterator( const vectorIterator<value_type>& it): _pointer(&(*it))
+				{}
 
 				vectorIterator( pointer ptr )
 				{
 					_pointer = ptr;
 				}
 
+				vectorIterator( const reference ref )
+				{
+					_pointer = &ref;
+				}
+
 				// DESTRUCTOR
 				~vectorIterator( void ) {}
 
 				// OPERATOR OVERLOAD
-				vectorIterator& operator = ( const vectorIterator& it)
+				vectorIterator& operator = ( const vectorIterator<T>& it)
 				{
 					if (this != &it)
 						_pointer = &(*it);
@@ -46,32 +49,62 @@ namespace ft
 				}
 
 				// COMPARISON
-				bool	operator == (const vectorIterator<const value_type>& it) const
+				bool	operator == (const vectorIterator<T>& it)
 				{
 					return (_pointer == &(*it));
 				}
 
-				bool	operator != (const vectorIterator<const value_type>& it) const
+				bool	operator == (const vectorIterator<const T>& it) const
+				{
+					return (_pointer == &(*it));
+				}
+
+				bool	operator != (const vectorIterator<T>& it)
 				{
 					return (_pointer != &(*it));
 				}
 
-				bool	operator >= (const vectorIterator<const value_type>& it) const
+				bool	operator != (const vectorIterator<const T>& it) const
+				{
+					return (_pointer != &(*it));
+				}
+
+				bool	operator >= (const vectorIterator<T>& it)
 				{
 					return (_pointer >= &(*it));
 				}
 
-				bool	operator <= (const vectorIterator<const value_type>& it) const
+				bool	operator >= (const vectorIterator<const T>& it) const
+				{
+					return (_pointer >= &(*it));
+				}
+
+				bool	operator <= (const vectorIterator<T>& it)
 				{
 					return (_pointer <= &(*it));
 				}
 
-				bool	operator > (const vectorIterator<const value_type>& it) const
+				bool	operator <= (const vectorIterator<const T>& it) const
+				{
+					return (_pointer <= &(*it));
+				}
+
+				bool	operator > (const vectorIterator<T>& it)
 				{
 					return (_pointer > &(*it));
 				}
 
-				bool	operator < (const vectorIterator<const value_type>& it) const
+				bool	operator > (const vectorIterator<const T>& it) const
+				{
+					return (_pointer > &(*it));
+				}
+
+				bool	operator < (const vectorIterator<T>& it)
+				{
+					return (_pointer < &(*it));
+				}
+
+				bool	operator < (const vectorIterator<const T>& it) const
 				{
 					return (_pointer < &(*it));
 				}
@@ -179,6 +212,7 @@ namespace ft
 				typedef typename iterator_traits<vectorIterator<T> >::pointer pointer;
 				typedef typename iterator_traits<vectorIterator<T> >::reference reference;
 
+
 				reverse_vectorIterator( void )
 				{
 					_it = vectorIterator<T>();
@@ -203,7 +237,7 @@ namespace ft
 				}
 
 				// DEREFERENCE
-				vectorIterator<T> base() const
+				iterator_type base() const
 				{
 					return (_it);
 				}

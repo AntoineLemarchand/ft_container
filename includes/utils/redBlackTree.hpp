@@ -1,7 +1,6 @@
 #pragma once
-#include <utility>
+#include "pair.hpp"
 #include <stdexcept>
-#include <iostream>
 
 namespace ft
 {
@@ -11,7 +10,7 @@ namespace ft
 			struct Node*	parent;
 			struct Node*	left;
 			struct Node*	right;
-			Pair&			val;
+			Pair*			val;
 			bool			color;
 
 			Node()
@@ -22,26 +21,27 @@ namespace ft
 				color = 0;
 			}
 
-			Node(const Pair& vl)
+			Node(const Pair& vl): val(vl)
 			{
 				parent = NULL;
 				left = NULL;
 				right = NULL;
 				color = 0;
-				val = vl;
 			}
 		};
 
-	template<class Key, class T>
+	template<class Key, class T, class Comp, class Alloc>
 		class redBlackTree
 		{
 			private:
-				std::allocator<Node<std::pair<Key, T> > >	_alloc;
-				Node<std::pair<Key, T> >*					_root;
-				std::size_t									_size;
+				typedef pair<const Key, T>	value_type;
+				typedef	Node<value_type>	node_type;
+
+				std::allocator<node_type>		_nodeAlloc;
+				Alloc							_alloc;
+				node_type*						_root;
+				std::size_t						_size;
 			public:
-				typedef	std::pair<Key, T> value_type;
-				typedef	Node<value_type> node_type;
 
 				redBlackTree()
 				{
@@ -66,20 +66,38 @@ namespace ft
 					clearNode(_root);
 				}
 
-
+				// UTILS
 				void	clearNode(node_type* node)
 				{
+					_size--;
 					if (node && node->left)
 						clearNode(node->left);
 					if (node && node->right)
 						clearNode(node->right);
 					if (node)
 					{
-						_alloc.destroy(node);
-						_alloc.deallocate(node, 1);
+						_nodeAlloc.destroy(node);
+						_nodeAlloc.deallocate(node, 1);
 					}
 				}
 
+				node_type*	searchTree(node_type* root, Key key)
+				{
+					if (root == NULL || root->val->first == key)
+						return (root);
+					if (root->val->first < key)
+						return (searchTree(root->right, key));
+					return (searchTree(root->left, key));
+				}
+
+
+				// INSERTION
+				/* to go from           to     */
+				/*     l                  r    */
+				/*    / \                / \   */
+				/*  l1   r              l  r2  */
+				/*      / \            / \   \ */
+				/*     r1 r2          l1 r1  r2*/
 				void	leftRotate(node_type* l)
 				{
 					node_type*	r;
@@ -99,6 +117,12 @@ namespace ft
 					l->parent = r;
 				}
 
+				/* to go from           to     */
+				/*     r                  l    */
+				/*    / \                / \   */
+				/*   l  r2             l1   r  */
+				/*  / \   \                / \ */
+				/* l1 r1  r2              r1 r2*/
 				void	rightRotate(node_type* r)
 				{
 					node_type*	l;
@@ -123,22 +147,14 @@ namespace ft
 				{
 					node_type tmp;
 
-					tmp.val = val;
+					tmp.val = _alloc.allocate(1);
+					_alloc.construct(tmp.val, val);
 					tmp.parent = parent;
 					tmp.left = NULL;
 					tmp.right = NULL;
 					tmp.color = 0;
-					*node = _alloc.allocate(1);
-					_alloc.construct(*node, tmp);
-				}
-
-				node_type*	searchTree(node_type* root, Key key)
-				{
-					if (root == NULL || root->val.first == key)
-						return (root);
-					if (root->val.first < key)
-						return (searchTree(root->right, key));
-					return (searchTree(root->left, key));
+					*node = _nodeAlloc.allocate(1);
+					_nodeAlloc.construct(*node, tmp);
 				}
 
 				// classic BST insert
@@ -151,17 +167,14 @@ namespace ft
 						if (_size == 0)
 							_root = root;
 					}
-					else if (val.first > root->val.first)
+					else if (val.first > root->val->first)
 						root->right = tree_insert(root->right, root, val);
-					else if (val.first < root->val.first)
+					else if (val.first < root->val->first)
 						root->left = tree_insert(root->left, root, val);
-					else
-						throw std::invalid_argument("BST: Duplicate key: " +
-								val.first);
 					return (root);
 				}
-//source
-//https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
+				//source
+				//https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
 				void	RBT_fixInsert(node_type* N)
 				{
 					node_type* P = N->parent; //parent
@@ -181,7 +194,6 @@ namespace ft
 						U = (G->right == P) ? G->left : G->right;
 						if (!U || U->color == 1)
 						{
-							bool dir = (N == P->right);
 							if (N == P->right && P == G->left)
 							{
 								leftRotate(P);
@@ -210,6 +222,14 @@ namespace ft
 					}
 				}
 
+				void insertNode(const value_type& val)
+				{
+					tree_insert(_root, NULL, val);
+					_size++;
+					RBT_fixInsert(searchTree(_root, val.first));
+				}
+
+				// DELETION
 				void	RBT_delNode(node_type* N)
 				{
 					node_type* P = N->parent; // parent
@@ -218,21 +238,15 @@ namespace ft
 					node_type* D; // distant nephew
 				}
 
-				void insertNode(value_type val)
-				{
-					node_type* newNode = tree_insert(_root, NULL, val);
-					_size++;
-					RBT_fixInsert(searchTree(_root, val.first));
-				}
-
 				void shiftNode(node_type* to, node_type* from)
 				{
-					std::cout << "shifting " << to->val.first << " with " << from->val.first << std::endl;
 					if (from->parent)
+					{
 						if (from->parent->right == from)
 							from->parent->right = NULL;
 						else
 							from->parent->left = NULL;
+					}
 					to->val = from->val;
 					_alloc.destroy(from);
 					_alloc.deallocate(from, 1);
@@ -245,11 +259,12 @@ namespace ft
 					return (N);
 				}
 
-//using
-//https://medium.com/analytics-vidhya/deletion-in-red-black-rb-tree-92301e1474ea
+				//using
+				//https://medium.com/analytics-vidhya/deletion-in-red-black-rb-tree-92301e1474ea
 				void deleteNode(node_type* N)
 				{
-					bool	original_color = N->color;
+					if (!N)
+						return;
 					// if node is red, perform a classic bst delete
 					if (N->right && N->left)
 						shiftNode(N, getMinimum(N->right));
@@ -270,14 +285,14 @@ namespace ft
 					}
 				}
 
-				node_type* getRoot( void )
+				node_type* getRoot( void ) const
 				{
 					return (_root);
 				}
 
-				std::size_t getSize( void )
+				std::size_t getSize( void ) const
 				{
 					return (_size);
 				}
 		};
-}
+} 
