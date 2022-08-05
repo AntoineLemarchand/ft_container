@@ -17,25 +17,6 @@ namespace ft
 					 Node*			_root;
 					 Node*			_leaf;
 
-					 void print2DUtil(Node *root, int space)
-					 {
-						 if (root == NULL || root == _leaf)
-							 return;
-						 space += 2;
-
-						 print2DUtil(root->right, space);
-
-						 std::cout<<std::endl;
-						 for (int i = 2; i < space; i++)
-							 std::cout<<" ";
-						 if (root->parent)
-							 std::cout << (root->parent->left == root ? "┗":"┏");
-						std::cout << (root->color ? "\033[1;40m" : "\033[1;41m");
-						 std::cout << static_cast<pair<const Key, T>* >(root->val)->first << " - " << static_cast<pair<const Key, T>* >(root->val)->second;
-						std::cout << ("\033[1;0m") << std::endl;
-
-						 print2DUtil(root->left, space);
-					 }
 					 // TREE UTILS
 					 void	clearNode(Node* node)
 					 {
@@ -264,9 +245,6 @@ namespace ft
 						 max->right = _leaf;
 						 _leaf->right = min;
 						 _leaf->left = max;
-						 std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
-						 print2DUtil(_root, 0);
-						 std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 					 }
 
 				 public:
@@ -578,140 +556,60 @@ namespace ft
 
 					 iterator lower_bound (const key_type& k)
 					 {
-						 Node* N = _root;
-						 Node* prev;
+						 iterator	ret = begin();
 
-						 if (static_cast<value_type*>(N->val)->first > k)
-						 {
-							 while (N && static_cast<value_type*>
-									 (N->val)->first > k)
-							 {
-								 prev = N;
-								 N = N->left;
-							 }
-							 while (N && static_cast<value_type*>
-									 (N->val)->first > k)
-							 {
-								 prev = N;
-								 N = N->right;
-							 }
-							 return (iterator(*prev));
-						 }
-						 else if (static_cast<value_type*>(N->val)->first < k)
-						 {
-							 while (N && static_cast<value_type*>
-									 (N->val)->first <= k)
-								 N = N->left;
-							 while (N && static_cast<value_type*>
-									 (N->val)->first <= k)
-								 N = N->right;
-							 return (iterator(*N));
-						 }
-						 return(iterator(*N));
+						 if (static_cast<value_type*>
+								 (_leaf->left->val)->first < k)
+							 return (end());
+						 while (ret->first < k
+								 && *ret != *static_cast<value_type*>
+								 (_leaf->right->val))
+							 ret++;
+						 return (ret);
 					 }
 
 					 const_iterator lower_bound (const key_type& k) const
 					 {
-						 Node* N = _root;
-						 Node* prev = _root;
+						 const_iterator	ret = begin();
 
-						 if (static_cast<value_type*>(N->val)->first > k)
-						 {
-							 while (N && static_cast<value_type*>
-									 (N->val)->first > k)
-							 {
-								 prev = N;
-								 N = N->left;
-							 }
-							 while (N && static_cast<value_type*>
-									 (N->val)->first > k)
-							 {
-								 prev = N;
-								 N = N->right;
-							 }
-							 return (const_iterator(*prev));
-						 }
-						 else if (static_cast<value_type*>(N->val)->first < k)
-						 {
-							 while (N && static_cast<value_type*>
-									 (N->val)->first <= k)
-								 N = N->left;
-							 while (N && static_cast<value_type*>
-									 (N->val)->first <= k)
-								 N = N->right;
-							 return (const_iterator(*N));
-						 }
-						 return(const_iterator(*N));
+						 if (static_cast<value_type*>
+								 (_leaf->left->val)->first < k)
+							 return (end());
+						 while (ret->first < k
+								 && *ret != *static_cast<value_type*>
+								 (_leaf->right->val))
+							 ret++;
+						 return (ret);
 					 }
 
 					 iterator upper_bound (const key_type& k)
 					 {
-						 Node* N = _root;
-						 Node* prev;
+						 iterator ret = end();
+						 ret--;
 
-						 if (static_cast<value_type*>(N->val)->first <= k)
-						 {
-							 prev = N;
-							 while (N && static_cast<value_type*>
-									 (N->val)->first <= k)
-							 {
-								 prev = N;
-								 N = N->right;
-							 }
-							 while (N && static_cast<value_type*>
-									 (N->val)->first <= k)
-							 {
-								 prev = N;
-								 N = N->left;
-							 }
-							 return (iterator(*prev));
-						 }
-						 else if (static_cast<value_type*>(N->val)->first > k)
-						 {
-							 while (N && static_cast<value_type*>
-									 (N->val)->first > k)
-								 N = N->left;
-							 while (N && static_cast<value_type*>
-									 (N->val)->first > k)
-								 N = N->right;
-							 return (iterator(*N));
-						 }
-						 return(iterator(*N));
+						 if (static_cast<value_type*>
+								 (_leaf->right->val)->first >= k)
+							 return (end());
+						 while (ret->first >= k
+								 && *ret != *static_cast<value_type*>
+								 (_leaf->left->val))
+							 ret--;
+						 return (ret);
 					 }
 
 					 const_iterator upper_bound (const key_type& k) const
 					 {
-						 Node* N = _root;
-						 Node* prev = _root;
+						 const_iterator ret = end();
+						 ret--;
 
-						 if (static_cast<value_type*>(N->val)->first <= k)
-						 {
-							 prev = N;
-							 while (N && static_cast<value_type*>
-									 (N->val)->first <= k)
-							 {
-								 prev = N;
-								 N = N->right;
-							 }
-							 while (N && static_cast<value_type*>
-									 (N->val)->first <= k)
-							 {
-								 prev = N;
-								 N = N->left;
-							 }
-							 return (const_iterator(*prev));
-						 }
-						 else if (static_cast<value_type*>(N->val)->first > k)
-						 {
-							 while (N && static_cast<value_type*>
-									 (N->val)->first > k)
-								 N = N->left;
-							 while (N && static_cast<value_type*>
-									 (N->val)->first > k)
-								 N = N->right;
-							 return (const_iterator(*N));
-						 }
-						 return(const_iterator(*N));
+						 if (static_cast<value_type*>
+								 (_leaf->left->val)->first >= k)
+							 return (end());
+						 while (ret->first >= k
+								 && *ret != *static_cast<value_type*>
+								 (_leaf->left->val))
+							 ret--;
+						 return (ret);
 					 }
 
 					 pair<const_iterator,const_iterator> equal_range

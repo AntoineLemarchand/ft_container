@@ -1,4 +1,5 @@
 #pragma once
+#include "../utils/iterator_traits.hpp"
 
 namespace ft
 {
@@ -111,12 +112,13 @@ namespace ft
 				mapIterator operator ++ ( void )
 				{
 					mapIterator	tmp(*this);
+					const Node*		prev;
 
 					if (_current->right)
 					{
+						prev = _current;
 						_current = _current->right;
-						if (_current->color != 2
-								&& _current->parent->color != 2)
+						if (_current->color != 2 && prev->color != 2)
 							while (_current->left)
 								_current = _current->left;
 					}
@@ -132,11 +134,13 @@ namespace ft
 
 				mapIterator& operator ++ ( int )
 				{
+					const Node*	prev;
+
 					if (_current->right)
 					{
+						prev = _current;
 						_current = _current->right;
-						if (_current->color != 2
-								&& _current->parent->color != 2)
+						if (_current->color != 2 && prev->color != 2)
 							while (_current->left)
 								_current = _current->left;
 					}
@@ -154,12 +158,13 @@ namespace ft
 				mapIterator operator -- ( int )
 				{
 					mapIterator	tmp(*this);
+					const Node*	prev;
 
 					if (_current->left)
 					{
+						prev = _current;
 						_current = _current->left;
-						if (_current->color != 2 
-								&& _current->parent->color != 2)
+						if (_current->color != 2 && prev->color != 2)
 							while (_current->right)
 								_current = _current->right;
 					}
@@ -175,11 +180,13 @@ namespace ft
 
 				mapIterator& operator -- ( void )
 				{
+					const Node*	prev;
+
 					if (_current->left)
 					{
+						prev = _current;
 						_current = _current->left;
-						if (_current->color != 2
-								&& _current->parent->color != 2)
+						if (_current->color != 2 && prev->color != 2)
 							while (_current->right)
 								_current = _current->right;
 					}
@@ -207,19 +214,19 @@ namespace ft
 			public:
 				typedef mapIterator<T> iterator_type;
 				typedef typename
-					iterator_traits<vectorIterator<T> >::iterator_category
+					iterator_traits<mapIterator<T> >::iterator_category
 					iterator_category;
 				typedef typename
-					iterator_traits<vectorIterator<T> >::value_type
+					iterator_traits<mapIterator<T> >::value_type
 					value_type;
 				typedef typename
-					iterator_traits<vectorIterator<T> >::difference_type
+					iterator_traits<mapIterator<T> >::difference_type
 					difference_type;
 				typedef typename
-					iterator_traits<vectorIterator<T> >::pointer
+					iterator_traits<mapIterator<T> >::pointer
 					pointer;
 				typedef typename
-					iterator_traits<vectorIterator<T> >::reference
+					iterator_traits<mapIterator<T> >::reference
 					reference;
 
 				reverse_mapIterator( void )
@@ -303,13 +310,13 @@ namespace ft
 				}
 
 				// PRE/POST INCREMENT
-				reverse_mapIterator<T>& operator++( void )
+				reverse_mapIterator<T>& operator ++ ( void )
 				{
 					--_it;
 					return (*this);
 				}
 
-				reverse_mapIterator<T>  operator++(int)
+				reverse_mapIterator<T>  operator ++ (int)
 				{
 					reverse_mapIterator<T> tmp(*this);
 					_it--;
@@ -317,13 +324,13 @@ namespace ft
 				}
 
 				// PRE/POST DECREMENT
-				reverse_mapIterator<T>& operator--( void )
+				reverse_mapIterator<T>& operator -- ( void )
 				{
 					++_it;
 					return (*this);
 				}
 
-				reverse_mapIterator<T>  operator--(int)
+				reverse_mapIterator<T>  operator -- (int)
 				{
 					reverse_mapIterator<T> tmp(*this);
 					_it++;

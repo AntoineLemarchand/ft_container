@@ -241,7 +241,7 @@ typedef TESTED_NAMESPACE::map<T1, T2>::value_type T3;
 typedef TESTED_NAMESPACE::map<T1, T2>::iterator ft_iterator;
 typedef TESTED_NAMESPACE::map<T1, T2>::const_iterator ft_const_iterator;
 
-//static int iter = 0;
+static int iter = 0;
 
 template <typename MAP>
 void	ft_bound(MAP &mp, const T1 &param)
@@ -249,7 +249,7 @@ void	ft_bound(MAP &mp, const T1 &param)
 	ft_iterator ite = mp.end(), it[2];
 	_pair<ft_iterator, ft_iterator> ft_range;
 
-	//std::cout << "\t-- [" << iter++ << "] --" << std::endl;
+	std::cout << "\t-- [" << iter++ << "] --" << std::endl;
 	std::cout << "with key [" << param << "]:" << std::endl;
 	it[0] = mp.lower_bound(param); it[1] = mp.upper_bound(param);
 	ft_range = mp.equal_range(param);
@@ -264,7 +264,7 @@ void	ft_const_bound(const MAP &mp, const T1 &param)
 	ft_const_iterator ite = mp.end(), it[2];
 	_pair<ft_const_iterator, ft_const_iterator> ft_range;
 
-	//std::cout << "\t-- [" << iter++ << "] (const) --" << std::endl;
+	std::cout << "\t-- [" << iter++ << "] (const) --" << std::endl;
 	std::cout << "with key [" << param << "]:" << std::endl;
 	it[0] = mp.lower_bound(param); it[1] = mp.upper_bound(param);
 	ft_range = mp.equal_range(param);
@@ -280,12 +280,6 @@ int		main(void)
 	for (unsigned int i = 0; i < lst_size; ++i)
 		lst.push_back(T3(i + 1, (i + 1) * 3));
 	TESTED_NAMESPACE::map<T1, T2> mp(lst.begin(), lst.end());
-	TESTED_NAMESPACE::map<T1, T2>::iterator it = mp.begin();
-	std::cout << it->first << " - " << it->second << std::endl;
-	it--;
-	it--;
-	std::cout << it->first << " - " << it->second << std::endl;
-	/*
 	printSize(mp);
 
 	ft_const_bound(mp, -10);
@@ -303,5 +297,4 @@ int		main(void)
 
 	printSize(mp);
 	return (0);
-	*/
 }
