@@ -21,10 +21,13 @@ ADDFLAGS		=
 #------------------------------------------------------------------------------#
 
 define	header
-	@printf "\e[38;5;2m┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-	@printf "┃ \e[38;5;12m $1\n"
-	@printf "\e[38;5;2m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-	@printf "\e[38;5;15m"
+	@printf "\e[38;5;2m\n"
+	@printf "███▓▒░\e[38;5;0m $1 \e[38;5;2m░▒▓███\n"
+	@printf "██▓▒░\e[38;5;0m  $1  \e[38;5;2m░▒▓██\n"
+	@printf "█▓▒░\e[38;5;12m   $1   \e[38;5;2m░▒▓█\n"
+	@printf "██▓▒░\e[38;5;0m  $1  \e[38;5;2m░▒▓██\n"
+	@printf "███▓▒░\e[38;5;0m $1 \e[38;5;2m░▒▓███\n"
+	@printf "\e[48;5;0m\e[38;5;15m"
 endef
 
 define	subheader
@@ -50,7 +53,7 @@ CXXFLAGS		+= $(ADDFLAGS)
 				$(CXX) $(CXXFLAGS) $(INC) -c $< -o $(<:.cpp=.o)
 
 ${NAME}:		$(OBJS)
-				$(call header, building $(NAME))
+				$(call header,building $(NAME))
 				$(CXX) $(CXXFLAGS) $(INC) $(OBJS) -o $(NAME) $(LIBS)
 
 all:			$(NAME)
