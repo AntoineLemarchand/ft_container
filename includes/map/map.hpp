@@ -2,6 +2,7 @@
 
 #include "mapIterator.hpp"
 #include "../utils/pair.hpp"
+#include <iostream>
 
 namespace ft
 {
@@ -16,6 +17,25 @@ namespace ft
 					 Node*			_root;
 					 Node*			_leaf;
 
+					 void print2DUtil(Node *root, int space)
+					 {
+						 if (root == NULL || root == _leaf)
+							 return;
+						 space += 2;
+
+						 print2DUtil(root->right, space);
+
+						 std::cout<<std::endl;
+						 for (int i = 2; i < space; i++)
+							 std::cout<<" ";
+						 if (root->parent)
+							 std::cout << (root->parent->left == root ? "┗":"┏");
+						std::cout << (root->color ? "\033[1;40m" : "\033[1;41m");
+						 std::cout << static_cast<pair<const Key, T>* >(root->val)->first << " - " << static_cast<pair<const Key, T>* >(root->val)->second;
+						std::cout << ("\033[1;0m") << std::endl;
+
+						 print2DUtil(root->left, space);
+					 }
 					 // TREE UTILS
 					 void	clearNode(Node* node)
 					 {
@@ -57,6 +77,55 @@ namespace ft
 						 return (searchTree(root->left, key));
 					 }
 
+					 /* to go from           to     */
+					 /*     l                  r    */
+					 /*    / \                / \   */
+					 /*  l1   r              l  r2  */
+					 /*      / \            / \   \ */
+					 /*     r1 r2          l1 r1  r2*/
+					 void	leftRotate(Node* l)
+					 {
+						 Node*	r;
+
+						 r = l->right;
+						 if (l->parent && l->parent->right == l)
+							 l->parent->right = r;
+						 else if (l->parent)
+							 l->parent->left = r;
+						 else
+							 _root = r;
+						 r->parent = l->parent;
+						 l->right = r->left;
+						 if (l->right)
+							 l->right->parent = l;
+						 r->left = l;
+						 l->parent = r;
+					 }
+
+					 /* to go from           to     */
+					 /*     r                  l    */
+					 /*    / \                / \   */
+					 /*   l  r2             l1   r  */
+					 /*  / \                    / \ */
+					 /* l1 l2                  l2 r2*/
+					 void	rightRotate(Node* r)
+					 {
+						 Node*	l;
+
+						 l = r->left;
+						 if (r->parent && r->parent->right == r)
+							 r->parent->right = l;
+						 else if (r->parent)
+							 r->parent->left = l;
+						 else
+							 _root = l;
+						 l->parent = r->parent;
+						 r->left = l->right;
+						 if (r->left)
+							 r->left->parent = r;
+						 l->right = r;
+						 r->parent = l;
+					 }
 
 					 // NODE DELETION
 					 void shiftNode(Node* to, Node* from)
@@ -107,16 +176,11 @@ namespace ft
 						 if (!root || root == _leaf)
 						 {
 							 Node tmp;
-
-							 // initializing node
 							 root = _nodeAlloc.allocate(1);
 							 _nodeAlloc.construct(root, tmp);
 							 root->val = _alloc.allocate(1);
 							 _alloc.construct(static_cast<value_type*>(root->val), val);
 							 root->parent = prev;
-							 root->left = NULL;
-							 root->right = NULL;
-							 root->color = 0;
 							 if (!_root)
 								 _root = root;
 						 }
@@ -127,55 +191,6 @@ namespace ft
 						 return (root);
 					 }
 
-					 /* to go from           to     */
-					 /*     l                  r    */
-					 /*    / \                / \   */
-					 /*  l1   r              l  r2  */
-					 /*      / \            / \   \ */
-					 /*     r1 r2          l1 r1  r2*/
-					 void	leftRotate(Node* l)
-					 {
-						 Node*	r;
-
-						 r = l->right;
-						 if (l->parent && l->parent->right == l)
-							 l->parent->right = r;
-						 else if (l->parent)
-							 l->parent->left = r;
-						 else
-							 _root = r;
-						 r->parent = l->parent;
-						 l->right = r->left;
-						 if (l->right)
-							 l->right->parent = l;
-						 r->left = l;
-						 l->parent = r;
-					 }
-
-					 /* to go from           to     */
-					 /*     r                  l    */
-					 /*    / \                / \   */
-					 /*   l  r2             l1   r  */
-					 /*  / \   \                / \ */
-					 /* l1 r1  r2              r1 r2*/
-					 void	rightRotate(Node* r)
-					 {
-						 Node*	l;
-
-						 l = r->left;
-						 if (r->parent && r->parent->right == r)
-							 r->parent->right = l;
-						 else if (r->parent)
-							 r->parent->left = l;
-						 else
-							 _root = l;
-						 l->parent = r->parent;
-						 r->left = l->right;
-						 if (r->left)
-							 r->left->parent = r;
-						 l->right = r;
-						 r->parent = l;
-					 }
 					 //source
 					 //https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
 					 void	RBT_fixInsert(Node* N)
@@ -184,18 +199,17 @@ namespace ft
 						 Node* G; //grandparent
 						 Node* U; // uncle
 
-						 _root->color = 1;
 						 while (P)
 						 {
-							 if (!P || P->color == 1)
+							 if (P->color == 1)
 								 return;
 							 if ((G = P->parent) == NULL)
 							 {
 								 P->color = 1;
-								 break;
+								 return;
 							 }
 							 U = (G->right == P) ? G->left : G->right;
-							 if (!U || U->color == 1)
+							 if (!U || U->color > 0)
 							 {
 								 if (N == P->right && P == G->left)
 								 {
@@ -215,7 +229,7 @@ namespace ft
 									 leftRotate(G);
 								 P->color = 1;
 								 G->color = 0;
-								 break;
+								 return;
 							 }
 							 P->color = 1;
 							 U->color = 1;
@@ -223,28 +237,32 @@ namespace ft
 							 N = G;
 							 P = N->parent;
 						 }
+						 _root->color = 1;
 					 }
 
 					 void insertNode(const pair<const Key, T>& val)
 					 {
 						 _size++;
-						 while (_root && _root->parent)
-							 _root = _root->parent;
-						 if (!_root)
-							 tree_insert(_root, NULL, val);
-						 else
+						 if (_root)
 						 {
 							 tree_insert(_root, NULL, val);
 							 RBT_fixInsert(searchTree(_root, val.first));
 						 }
+						 else
+							 tree_insert(_root, NULL, val);
+						 while (_root && _root->parent)
+							 _root = _root->parent;
 						 while (_root->parent)
 							 _root = _root->parent;
 						 Node *min = getMinimum(_root);
 						 Node *max = getMaximum(_root);
 						 min->left = _leaf;
-						 max->right = _leaf;
 						 _leaf->right = min;
+						 max->right = _leaf;
 						 _leaf->left = max;
+						 std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
+						 print2DUtil(_root, 0);
+						 std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 					 }
 
 				 public:
@@ -370,12 +388,12 @@ namespace ft
 
 					 iterator end()
 					 {
-						 return (iterator(*(getMaximum(_root) + 1)));
+						 return (iterator(*_leaf));
 					 }
 
 					 const_iterator end() const
 					 {
-						 return (const_iterator(*(getMaximum(_root) + 1)));
+						 return (const_iterator(*_leaf));
 					 }
 
 					 reverse_iterator rbegin()

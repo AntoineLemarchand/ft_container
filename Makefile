@@ -2,19 +2,17 @@
 #                         EDIT THIS BLOCK                                      #
 #------------------------------------------------------------------------------#
 
-NAME			= 	compare_containers
+NAME				= 	compare_containers
 
-# src definition
-SRCDIR			= 	srcs/
-# this is to define which compiler to use
-SRCTYPE			=	.cpp
-SRCFILES		=	unitTest main
+SRCDIR				= 	srcs/
+SRCFILES			=	unitTest main
+SRCTYPE				=	.cpp
 
-INCDIR			= includes includes/vector includes/stack includes/map
+INCDIR				= includes includes/vector includes/stack includes/map
 
-RM				= rm -f
+RM					= rm -f
 
-ADDFLAGS		= -g -fsanitize=address
+ADDITIONNALFLAGS	= -g #-fsanitize=address
 
 #------------------------------------------------------------------------------#
 #                         DO NOT EDIT BELOW THIS LINE                          #
@@ -40,8 +38,8 @@ INC				= $(addprefix -I, $(INCDIR))
 
 CXX				= $(if $(filter-out .cpp, $(SRCTYPE)), cc, c++)
 CXXFLAGS		= -Wall -Wextra -Werror
-CXXFLAGS		+= $(if $(filter-out .cpp, $(SRCTYPE)),, -std=c++98)
-CXXFLAGS		+= $(ADDFLAGS)
+CXXFLAGS		+= $(if $(filter-out .cpp, $(SRCTYPE)),,-std=c++98)
+CXXFLAGS		+= $(ADDITIONNALFLAGS)
 
 %.o : %$(SRCTYPE)
 				$(call subheader,building $<)

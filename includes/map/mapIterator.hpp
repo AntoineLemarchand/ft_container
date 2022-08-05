@@ -9,6 +9,15 @@ namespace ft
 		struct Node*	right;
 		void*			val;
 		int				color;
+
+		Node()
+		{
+			parent = NULL;
+			left = NULL;
+			right = NULL;
+			val = NULL;
+			color = 0;
+		}
 	};
 
 	template < class T >
@@ -98,8 +107,9 @@ namespace ft
 					if (_current->right)
 					{
 						_current = _current->right;
-						while (_current->left)
-							_current = _current->left;
+						if (_current->color != 2)
+							while (_current->left)
+								_current = _current->left;
 					}
 					else if (_current->parent)
 					{
@@ -116,8 +126,9 @@ namespace ft
 					if (_current->right)
 					{
 						_current = _current->right;
-						while (_current->left)
-							_current = _current->left;
+						if (_current->color != 2)
+							while (_current->left)
+								_current = _current->left;
 					}
 					else if (_current->parent)
 					{
@@ -130,36 +141,38 @@ namespace ft
 				}
 
 				// PRE/POST DECREMENT
-				mapIterator& operator -- ( int )
+				mapIterator operator -- ( int )
 				{
 					mapIterator	tmp(*this);
 
 					if (_current->parent
-							&& *static_cast<T>(_current) <
-							*static_cast<T>(_current->parent))
+							&& *static_cast<T* const>(_current->val) <
+							*static_cast<T* const>(_current->parent->val))
 						_current = _current->parent;
 					else if (_current->left)
 					{
 						_current = _current->left;
-						while (_current->right)
-							_current = _current->right;
+						if (_current->color != 2)
+							while (_current->right)
+								_current = _current->right;
 					}
 					return (tmp);
 				}
 
-				mapIterator operator -- ( void )
+				mapIterator& operator -- ( void )
 				{
 					if (_current->parent
-							&& *static_cast<T>(_current) <
-							*static_cast<T>(_current->parent))
+							&& *static_cast<T* const>(_current->val) <
+							*static_cast<T* const>(_current->parent->val))
 						_current = _current->parent;
 					else if (_current->left)
 					{
 						_current = _current->left;
-						while (_current->right)
-							_current = _current->right;
+						if (_current->color != 2)
+							while (_current->right)
+								_current = _current->right;
 					}
-					return(_current);
+					return(*this);
 				}
 
 				const Node*	getCurrent() const
