@@ -11,18 +11,30 @@ namespace	ft
 		class vector
 		{
 			public:
-				typedef	T											value_type;
-				typedef	Alloc										allocator_type;
-				typedef	T&											reference;
-				typedef	const T&									const_reference;
-				typedef	T*											pointer;
-				typedef	const T*									const_pointer;
-				typedef	vectorIterator<value_type>					iterator;
-				typedef	vectorIterator<const value_type>			const_iterator;
-				typedef	reverse_vectorIterator<value_type>			reverse_iterator;
-				typedef	reverse_vectorIterator<const value_type>	const_reverse_iterator;
-				typedef	std::ptrdiff_t								difference_type;
-				typedef	std::size_t									size_type;
+				typedef	T
+					value_type;
+				typedef	Alloc
+					allocator_type;
+				typedef	T&
+					reference;
+				typedef	const T&
+					const_reference;
+				typedef	T*
+					pointer;
+				typedef	const T*
+					const_pointer;
+				typedef	vectorIterator<value_type>
+					iterator;
+				typedef	vectorIterator<const value_type>
+					const_iterator;
+				typedef	reverse_vectorIterator<value_type>
+					reverse_iterator;
+				typedef	reverse_vectorIterator<const value_type>
+					const_reverse_iterator;
+				typedef	std::ptrdiff_t
+					difference_type;
+				typedef	std::size_t
+					size_type;
 
 				// CONSTRUCTORS
 				explicit vector(const allocator_type& alloc = Alloc())
@@ -47,7 +59,9 @@ namespace	ft
 
 				template <class InputIterator>
 					vector (InputIterator first,
-							typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type last,
+							typename ft::enable_if<
+							!ft::is_integral<InputIterator>::value,
+							InputIterator>::type last,
 							const allocator_type& alloc = allocator_type())
 					{
 
@@ -260,7 +274,9 @@ namespace	ft
 				// MODIFIERS
 				template <class InputIterator>
 					void assign (InputIterator first,
-							typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type last)
+							typename ft::enable_if<
+							!ft::is_integral<InputIterator>::value,
+							InputIterator>::type last)
 					{
 						clear();
 						for (InputIterator it = first; it != last; it++)
@@ -328,7 +344,9 @@ namespace	ft
 
 				template <class InputIterator>
 					void insert (iterator position, InputIterator first,
-							typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type last)
+							typename ft::enable_if<
+							!ft::is_integral<InputIterator>::value,
+							InputIterator>::type last)
 					{
 						for (InputIterator it = first; it != last; it++)
 							position = insert(position, *it) + 1;
@@ -442,15 +460,14 @@ namespace	ft
 		bool operator >  (const vector<T,Alloc>& lhs,
 				const vector<T,Alloc>& rhs)
 		{
-			return (!lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(),
-						rhs.end()) && lhs != rhs);
+			return (!lhs <= rhs);
 		}
 
 	template <class T, class Alloc>
 		bool operator >= (const vector<T,Alloc>& lhs,
 				const vector<T,Alloc>& rhs)
 		{
-			return (lhs == rhs || lhs > rhs);
+			return (!lhs < rhs);
 		}
 
 	template <class T, class Alloc>

@@ -26,16 +26,22 @@ namespace ft
 			private:
 				const Node* _current;
 			public:
-				typedef	typename iterator_traits<T*>::difference_type	difference_type;
-				typedef	typename iterator_traits<T*>::value_type		value_type;
-				typedef	typename iterator_traits<T*>::pointer			pointer;
-				typedef	typename iterator_traits<T*>::reference			reference;
-				typedef typename iterator_traits<T*>::iterator_category	iterator_category;
+				typedef	typename iterator_traits<T*>::difference_type
+					difference_type;
+				typedef	typename iterator_traits<T*>::value_type	
+					value_type;
+				typedef	typename iterator_traits<T*>::pointer		
+					pointer;
+				typedef	typename iterator_traits<T*>::reference		
+					reference;
+				typedef typename iterator_traits<T*>::iterator_category
+					iterator_category;
 
 				operator mapIterator<const T>() const
 				{
-					return (mapIterator<const T>(this->_current));
+					return (mapIterator<const T>(*this->_current));
 				}
+
 				// CONSTRUCTORS
 				mapIterator( void )
 				{
@@ -66,19 +72,21 @@ namespace ft
 				}
 
 				// COMPARISON
-				bool	operator == (const mapIterator<const value_type>& it) const
+				bool	operator == (const mapIterator<const value_type>& it)
+					const
 				{
 					return (_current == it.getCurrent());
 				}
 
-				bool	operator != (const mapIterator<const value_type>& it) const
+				bool	operator != (const mapIterator<const value_type>& it)
+					const
 				{
 					return (!(*this == it));
 				}
 
 				bool	operator == (const mapIterator<value_type>& it)
 				{
-					return (*static_cast<value_type*>(_current->val) == *it);
+					return (_current->val == &(*it));
 				}
 
 				bool	operator != (const mapIterator<value_type>& it)
@@ -107,16 +115,17 @@ namespace ft
 					if (_current->right)
 					{
 						_current = _current->right;
-						if (_current->color != 2)
+						if (_current->color != 2
+								&& _current->parent->color != 2)
 							while (_current->left)
 								_current = _current->left;
 					}
-					else if (_current->parent)
+					else
 					{
-						if (_current->parent->left == _current)
+						while (_current->parent
+								&& _current == _current->parent->right)
 							_current = _current->parent;
-						else
-							_current = _current->parent->parent;
+						_current = _current->parent;
 					}
 					return (tmp);
 				}
@@ -126,16 +135,17 @@ namespace ft
 					if (_current->right)
 					{
 						_current = _current->right;
-						if (_current->color != 2)
+						if (_current->color != 2
+								&& _current->parent->color != 2)
 							while (_current->left)
 								_current = _current->left;
 					}
-					else if (_current->parent)
+					else
 					{
-						if (_current->parent->left == _current)
+						while (_current->parent
+								&& _current == _current->parent->right)
 							_current = _current->parent;
-						else
-							_current = _current->parent->parent;
+						_current = _current->parent;
 					}
 					return(*this);
 				}
@@ -145,32 +155,40 @@ namespace ft
 				{
 					mapIterator	tmp(*this);
 
-					if (_current->parent
-							&& *static_cast<T* const>(_current->val) <
-							*static_cast<T* const>(_current->parent->val))
-						_current = _current->parent;
-					else if (_current->left)
+					if (_current->left)
 					{
 						_current = _current->left;
-						if (_current->color != 2)
+						if (_current->color != 2 
+								&& _current->parent->color != 2)
 							while (_current->right)
 								_current = _current->right;
+					}
+					else
+					{
+						while (_current->parent
+								&& _current == _current->parent->left)
+							_current = _current->parent;
+						_current = _current->parent;
 					}
 					return (tmp);
 				}
 
 				mapIterator& operator -- ( void )
 				{
-					if (_current->parent
-							&& *static_cast<T* const>(_current->val) <
-							*static_cast<T* const>(_current->parent->val))
-						_current = _current->parent;
-					else if (_current->left)
+					if (_current->left)
 					{
 						_current = _current->left;
-						if (_current->color != 2)
+						if (_current->color != 2
+								&& _current->parent->color != 2)
 							while (_current->right)
 								_current = _current->right;
+					}
+					else
+					{
+						while (_current->parent
+								&& _current == _current->parent->left)
+							_current = _current->parent;
+						_current = _current->parent;
 					}
 					return(*this);
 				}
@@ -187,16 +205,26 @@ namespace ft
 			private:
 				mapIterator<T>	_it;
 			public:
-				typedef vectorIterator<T> iterator_type;
-				typedef typename iterator_traits<vectorIterator<T> >::iterator_category iterator_category;
-				typedef typename iterator_traits<vectorIterator<T> >::value_type value_type;
-				typedef typename iterator_traits<vectorIterator<T> >::difference_type difference_type;
-				typedef typename iterator_traits<vectorIterator<T> >::pointer pointer;
-				typedef typename iterator_traits<vectorIterator<T> >::reference reference;
+				typedef mapIterator<T> iterator_type;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::iterator_category
+					iterator_category;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::value_type
+					value_type;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::difference_type
+					difference_type;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::pointer
+					pointer;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::reference
+					reference;
 
 				reverse_mapIterator( void )
 				{
-					_it = mapIterator<T>();
+					_it = iterator_type();
 				}
 
 				explicit reverse_mapIterator(iterator_type it)
@@ -205,12 +233,14 @@ namespace ft
 				}
 
 				template <class Iter>
-					reverse_mapIterator<T> (const reverse_mapIterator<Iter>& rev_it)
+					reverse_mapIterator<T>
+					(const reverse_mapIterator<Iter>& rev_it)
 					{
 						_it = rev_it.base();
 					}
 
-				reverse_mapIterator<T>& operator = ( const reverse_mapIterator<T>& rit)
+				reverse_mapIterator<T>& operator =
+					( const reverse_mapIterator<T>& rit)
 				{
 					if (this != &rit)
 						_it = rit.base();
@@ -227,7 +257,6 @@ namespace ft
 				{
 					mapIterator<T> retVal(_it);
 					retVal--;
-
 					return (*retVal);
 				}
 
@@ -237,32 +266,38 @@ namespace ft
 				}
 
 				// COMPARISON
-				bool	operator == (const reverse_mapIterator<const value_type>& it) const
+				bool	operator ==
+					(const reverse_mapIterator<const value_type>& it) const
 				{
 					return (_it == it.base());
 				}
 
-				bool	operator != (const reverse_mapIterator<const value_type>& it) const
+				bool	operator !=
+					(const reverse_mapIterator<const value_type>& it) const
 				{
 					return (_it != it.base());
 				}
 
-				bool	operator < (const reverse_mapIterator<const value_type>& it) const
+				bool	operator <
+					(const reverse_mapIterator<const value_type>& it) const
 				{
 					return (_it > it.base());
 				}
 
-				bool	operator <= (const reverse_mapIterator<const value_type>& it) const
+				bool	operator <=
+					(const reverse_mapIterator<const value_type>& it) const
 				{
 					return (_it >= it.base());
 				}
 
-				bool	operator > (const reverse_mapIterator<const value_type>& it) const
+				bool	operator >
+					(const reverse_mapIterator<const value_type>& it) const
 				{
 					return (_it < it.base());
 				}
 
-				bool	operator >= (const reverse_mapIterator<const value_type>& it) const
+				bool	operator >=
+					(const reverse_mapIterator<const value_type>& it) const
 				{
 					return (_it <= it.base());
 				}

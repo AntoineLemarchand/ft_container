@@ -12,11 +12,16 @@ namespace ft
 			private:
 				T*	_pointer;
 			public:
-				typedef	typename iterator_traits<T*>::difference_type	difference_type;
-				typedef	typename iterator_traits<T*>::value_type		value_type;
-				typedef	typename iterator_traits<T*>::pointer			pointer;
-				typedef	typename iterator_traits<T*>::reference			reference;
-				typedef typename iterator_traits<T*>::iterator_category	iterator_category;
+				typedef	typename iterator_traits<T*>::difference_type
+					difference_type;
+				typedef	typename iterator_traits<T*>::value_type
+					value_type;
+				typedef	typename iterator_traits<T*>::pointer
+					pointer;
+				typedef	typename iterator_traits<T*>::reference
+					reference;
+				typedef typename iterator_traits<T*>::iterator_category
+					iterator_category;
 
 				// CONSTRUCTORS
 				vectorIterator( void )
@@ -24,7 +29,8 @@ namespace ft
 					_pointer = NULL;
 				}
 
-				vectorIterator( const vectorIterator<value_type>& it): _pointer(&(*it))
+				vectorIterator( const vectorIterator<value_type>& it):
+					_pointer(&(*it))
 				{}
 
 				vectorIterator( pointer ptr )
@@ -135,7 +141,8 @@ namespace ft
 
 				difference_type operator + ( const vectorIterator& it) const
 				{
-					return (reinterpret_cast<long>(_pointer) + reinterpret_cast<long>(&(*it)));
+					return (reinterpret_cast<long>(_pointer)
+							+ reinterpret_cast<long>(&(*it)));
 				}
 
 				vectorIterator& operator += ( const int n )
@@ -144,7 +151,8 @@ namespace ft
 					return (*this);
 				}
 
-				friend vectorIterator operator + (difference_type n, vectorIterator& it)
+				friend vectorIterator operator + (difference_type n,
+						vectorIterator& it)
 				{
 					return (vectorIterator(n + it._pointer));
 				}
@@ -179,7 +187,8 @@ namespace ft
 					return (*this);
 				}
 
-				friend vectorIterator operator - (difference_type n, vectorIterator& it)
+				friend vectorIterator operator - (difference_type n,
+						vectorIterator& it)
 				{
 					return (vectorIterator(n - it._pointer));
 				}
@@ -206,11 +215,21 @@ namespace ft
 				vectorIterator<T>	_it;
 			public:
 				typedef vectorIterator<T> iterator_type;
-				typedef typename iterator_traits<vectorIterator<T> >::iterator_category iterator_category;
-				typedef typename iterator_traits<vectorIterator<T> >::value_type value_type;
-				typedef typename iterator_traits<vectorIterator<T> >::difference_type difference_type;
-				typedef typename iterator_traits<vectorIterator<T> >::pointer pointer;
-				typedef typename iterator_traits<vectorIterator<T> >::reference reference;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::iterator_category
+					iterator_category;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::value_type
+					value_type;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::difference_type
+					difference_type;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::pointer
+					pointer;
+				typedef typename
+					iterator_traits<vectorIterator<T> >::reference
+					reference;
 
 
 				reverse_vectorIterator( void )
@@ -224,12 +243,14 @@ namespace ft
 				}
 
 				template <class Iter>
-					reverse_vectorIterator<T> (const reverse_vectorIterator<Iter>& rev_it)
+					reverse_vectorIterator<T>
+					(const reverse_vectorIterator<Iter>& rev_it)
 					{
 						_it = rev_it.base();
 					}
 
-				reverse_vectorIterator<T>& operator = ( const reverse_vectorIterator<T>& rit)
+				reverse_vectorIterator<T>& operator =
+					( const reverse_vectorIterator<T>& rit)
 				{
 					if (this != &rit)
 						_it = rit.base();
@@ -258,32 +279,38 @@ namespace ft
 				}
 
 				// COMPARISON
-				bool	operator == (const reverse_vectorIterator<const value_type>& it) const
+				bool	operator ==
+					(const reverse_vectorIterator<const value_type>& it) const
 				{
 					return (_it == it.base());
 				}
 
-				bool	operator != (const reverse_vectorIterator<const value_type>& it) const
+				bool	operator !=
+					(const reverse_vectorIterator<const value_type>& it) const
 				{
 					return (_it != it.base());
 				}
 
-				bool	operator < (const reverse_vectorIterator<const value_type>& it) const
+				bool	operator <
+					(const reverse_vectorIterator<const value_type>& it) const
 				{
 					return (_it > it.base());
 				}
 
-				bool	operator <= (const reverse_vectorIterator<const value_type>& it) const
+				bool	operator <=
+					(const reverse_vectorIterator<const value_type>& it) const
 				{
 					return (_it >= it.base());
 				}
 
-				bool	operator > (const reverse_vectorIterator<const value_type>& it) const
+				bool	operator >
+					(const reverse_vectorIterator<const value_type>& it) const
 				{
 					return (_it < it.base());
 				}
 
-				bool	operator >= (const reverse_vectorIterator<const value_type>& it) const
+				bool	operator >=
+					(const reverse_vectorIterator<const value_type>& it) const
 				{
 					return (_it <= it.base());
 				}
@@ -294,13 +321,14 @@ namespace ft
 					return (reverse_vectorIterator(_it - n));
 				}
 
-				difference_type operator + (const reverse_vectorIterator<T>& n) const
+				difference_type operator +
+					(const reverse_vectorIterator<T>& n) const
 				{
 					return (-(_it + n.base()));
 				}
 
-				friend reverse_vectorIterator<T> operator + (
-						difference_type n, const reverse_vectorIterator<T>& rev_it)
+				friend reverse_vectorIterator<T> operator +
+					(difference_type n, const reverse_vectorIterator<T>& rev_it)
 				{
 					return (reverse_vectorIterator<T>(rev_it._it - n));
 				}
@@ -326,8 +354,8 @@ namespace ft
 				}
 
 				//SUBSTRACTION
-				friend reverse_vectorIterator<T> operator - (
-						difference_type n, const reverse_vectorIterator<T>& rev_it)
+				friend reverse_vectorIterator<T> operator -
+					(difference_type n, const reverse_vectorIterator<T>& rev_it)
 				{
 					return (reverse_vectorIterator<T>(rev_it._it + n));
 				}
@@ -337,7 +365,8 @@ namespace ft
 					return (reverse_vectorIterator(_it + n));
 				}
 
-				difference_type operator - (const reverse_vectorIterator<T>& n) const
+				difference_type operator -
+					(const reverse_vectorIterator<T>& n) const
 				{
 					return (-(_it - n.base()));
 				}

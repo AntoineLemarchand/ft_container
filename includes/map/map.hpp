@@ -46,8 +46,10 @@ namespace ft
 								 clearNode(node->left);
 							 if (node->right)
 								 clearNode(node->right);
-							 _alloc.destroy(static_cast<pair<const Key, T>* >(node->val));
-							 _alloc.deallocate(static_cast<pair<const Key, T>* >(node->val), 1);
+							 _alloc.destroy(static_cast<pair<const Key, T>* >
+									 (node->val));
+							 _alloc.deallocate(static_cast<pair<const Key, T>* >
+									 (node->val), 1);
 							 _nodeAlloc.destroy(node);
 							 _nodeAlloc.deallocate(node, 1);
 						 }
@@ -70,7 +72,8 @@ namespace ft
 					 Node*	searchTree(Node* root, Key key) const
 					 {
 						 if (root == NULL || root == _leaf
-								 || static_cast<value_type*>(root->val)->first == key)
+								 || static_cast<value_type*>
+								 (root->val)->first == key)
 							 return (root);
 						 if (static_cast<value_type*>(root->val)->first < key)
 							 return (searchTree(root->right, key));
@@ -179,20 +182,23 @@ namespace ft
 							 root = _nodeAlloc.allocate(1);
 							 _nodeAlloc.construct(root, tmp);
 							 root->val = _alloc.allocate(1);
-							 _alloc.construct(static_cast<value_type*>(root->val), val);
+							 _alloc.construct(static_cast<value_type*>
+									 (root->val), val);
 							 root->parent = prev;
 							 if (!_root)
 								 _root = root;
 						 }
-						 else if (val.first > static_cast<value_type*>(root->val)->first)
+						 else if (val.first > static_cast<value_type*>
+								 (root->val)->first)
 							 root->right = tree_insert(root->right, root, val);
-						 else if (val.first < static_cast<value_type*>(root->val)->first)
+						 else if (val.first < static_cast<value_type*>
+								 (root->val)->first)
 							 root->left = tree_insert(root->left, root, val);
 						 return (root);
 					 }
-
+					 
 					 //source
-					 //https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
+			 //https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
 					 void	RBT_fixInsert(Node* N)
 					 {
 						 Node* P = N->parent; //parent
@@ -252,13 +258,11 @@ namespace ft
 							 tree_insert(_root, NULL, val);
 						 while (_root && _root->parent)
 							 _root = _root->parent;
-						 while (_root->parent)
-							 _root = _root->parent;
 						 Node *min = getMinimum(_root);
 						 Node *max = getMaximum(_root);
 						 min->left = _leaf;
-						 _leaf->right = min;
 						 max->right = _leaf;
+						 _leaf->right = min;
 						 _leaf->left = max;
 						 std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
 						 print2DUtil(_root, 0);
@@ -268,22 +272,37 @@ namespace ft
 				 public:
 					 // MEMBER TYPES
 					 //		BASIC
-					 typedef Key										key_type;
-					 typedef T											mapped_type;
-					 typedef pair<const key_type, mapped_type>			value_type;
-					 typedef Compare									key_compare;
-					 typedef Alloc										allocator_type;
-					 typedef typename allocator_type::reference			reference;
-					 typedef typename allocator_type::const_reference	const_reference;
-					 typedef typename allocator_type::pointer			pointer;
-					 typedef typename allocator_type::const_pointer		const_pointer;
+					 typedef Key
+						 key_type;
+					 typedef T
+						 mapped_type;
+					 typedef pair<const key_type, mapped_type>
+						 value_type;
+					 typedef Compare
+						 key_compare;
+					 typedef Alloc
+						 allocator_type;
+					 typedef typename allocator_type::reference
+						 reference;
+					 typedef typename allocator_type::const_reference
+						 const_reference;
+					 typedef typename allocator_type::pointer
+						 pointer;
+					 typedef typename allocator_type::const_pointer
+						 const_pointer;
 					 //		ITERATORS
-					 typedef mapIterator<value_type>					iterator;
-					 typedef mapIterator<const value_type>				const_iterator;
-					 typedef reverse_mapIterator<value_type>			reverse_iterator;
-					 typedef reverse_mapIterator<const value_type>		const_reverse_iterator;
-					 typedef std::ptrdiff_t								difference_type;
-					 typedef std::size_t								size_type;
+					 typedef mapIterator<value_type>
+						 iterator;
+					 typedef mapIterator<const value_type>
+						 const_iterator;
+					 typedef reverse_mapIterator<value_type>
+						 reverse_iterator;
+					 typedef reverse_mapIterator<const value_type>
+						 const_reverse_iterator;
+					 typedef std::ptrdiff_t
+						 difference_type;
+					 typedef std::size_t
+						 size_type;
 
 					 class value_compare
 					 {
@@ -378,22 +397,22 @@ namespace ft
 					 // ITERATORS
 					 iterator begin()
 					 {
-						 return (iterator(*getMinimum(_root)));
+						 return (*_leaf->right);
 					 }
 
 					 const_iterator begin() const
 					 {
-						 return (const_iterator(*getMinimum(_root)));
+						 return (*_leaf->right);
 					 }
 
 					 iterator end()
 					 {
-						 return (iterator(*_leaf));
+						 return (*_leaf);
 					 }
 
 					 const_iterator end() const
 					 {
-						 return (const_iterator(*_leaf));
+						 return (*_leaf);
 					 }
 
 					 reverse_iterator rbegin()
@@ -564,12 +583,14 @@ namespace ft
 
 						 if (static_cast<value_type*>(N->val)->first > k)
 						 {
-							 while (N && static_cast<value_type*>(N->val)->first > k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first > k)
 							 {
 								 prev = N;
 								 N = N->left;
 							 }
-							 while (N && static_cast<value_type*>(N->val)->first > k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first > k)
 							 {
 								 prev = N;
 								 N = N->right;
@@ -578,9 +599,11 @@ namespace ft
 						 }
 						 else if (static_cast<value_type*>(N->val)->first < k)
 						 {
-							 while (N && static_cast<value_type*>(N->val)->first <= k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first <= k)
 								 N = N->left;
-							 while (N && static_cast<value_type*>(N->val)->first <= k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first <= k)
 								 N = N->right;
 							 return (iterator(*N));
 						 }
@@ -594,12 +617,14 @@ namespace ft
 
 						 if (static_cast<value_type*>(N->val)->first > k)
 						 {
-							 while (N && static_cast<value_type*>(N->val)->first > k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first > k)
 							 {
 								 prev = N;
 								 N = N->left;
 							 }
-							 while (N && static_cast<value_type*>(N->val)->first > k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first > k)
 							 {
 								 prev = N;
 								 N = N->right;
@@ -608,9 +633,11 @@ namespace ft
 						 }
 						 else if (static_cast<value_type*>(N->val)->first < k)
 						 {
-							 while (N && static_cast<value_type*>(N->val)->first <= k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first <= k)
 								 N = N->left;
-							 while (N && static_cast<value_type*>(N->val)->first <= k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first <= k)
 								 N = N->right;
 							 return (const_iterator(*N));
 						 }
@@ -625,12 +652,14 @@ namespace ft
 						 if (static_cast<value_type*>(N->val)->first <= k)
 						 {
 							 prev = N;
-							 while (N && static_cast<value_type*>(N->val)->first <= k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first <= k)
 							 {
 								 prev = N;
 								 N = N->right;
 							 }
-							 while (N && static_cast<value_type*>(N->val)->first <= k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first <= k)
 							 {
 								 prev = N;
 								 N = N->left;
@@ -639,9 +668,11 @@ namespace ft
 						 }
 						 else if (static_cast<value_type*>(N->val)->first > k)
 						 {
-							 while (N && static_cast<value_type*>(N->val)->first > k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first > k)
 								 N = N->left;
-							 while (N && static_cast<value_type*>(N->val)->first > k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first > k)
 								 N = N->right;
 							 return (iterator(*N));
 						 }
@@ -656,12 +687,14 @@ namespace ft
 						 if (static_cast<value_type*>(N->val)->first <= k)
 						 {
 							 prev = N;
-							 while (N && static_cast<value_type*>(N->val)->first <= k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first <= k)
 							 {
 								 prev = N;
 								 N = N->right;
 							 }
-							 while (N && static_cast<value_type*>(N->val)->first <= k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first <= k)
 							 {
 								 prev = N;
 								 N = N->left;
@@ -670,21 +703,24 @@ namespace ft
 						 }
 						 else if (static_cast<value_type*>(N->val)->first > k)
 						 {
-							 while (N && static_cast<value_type*>(N->val)->first > k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first > k)
 								 N = N->left;
-							 while (N && static_cast<value_type*>(N->val)->first > k)
+							 while (N && static_cast<value_type*>
+									 (N->val)->first > k)
 								 N = N->right;
 							 return (const_iterator(*N));
 						 }
 						 return(const_iterator(*N));
 					 }
 
-					 pair<const_iterator,const_iterator> equal_range (const key_type& k) const
+					 pair<const_iterator,const_iterator> equal_range
+						 (const key_type& k) const
 					 {
 						 return(make_pair(lower_bound(k), upper_bound(k)));
 					 }
 
-					 pair<iterator,iterator>             equal_range (const key_type& k)
+					 pair<iterator,iterator>	equal_range (const key_type& k)
 					 {
 						 return(make_pair(lower_bound(k), upper_bound(k)));
 					 }

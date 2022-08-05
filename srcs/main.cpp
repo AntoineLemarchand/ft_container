@@ -281,10 +281,10 @@ int		main(void)
 		lst.push_back(T3(i + 1, (i + 1) * 3));
 	TESTED_NAMESPACE::map<T1, T2> mp(lst.begin(), lst.end());
 	TESTED_NAMESPACE::map<T1, T2>::iterator it = mp.begin();
-	std::cout << "1 - 3 is " << it->first << " - " << it->second << std::endl;
+	std::cout << it->first << " - " << it->second << std::endl;
 	it--;
 	it--;
-	std::cout << "10 - 30 is " << it->first << " - " << it->second << std::endl;
+	std::cout << it->first << " - " << it->second << std::endl;
 	/*
 	printSize(mp);
 
