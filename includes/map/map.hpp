@@ -20,19 +20,17 @@ namespace ft
 					 void	clearNode(Node* node)
 					 {
 						 _size--;
-						 if (node && node != _leaf && node->left)
-							 clearNode(node->left);
-						 if (node && node != _leaf && node->right)
-							 clearNode(node->right);
 						 if (node && node != _leaf)
 						 {
+							 if (node->left)
+								 clearNode(node->left);
+							 if (node->right)
+								 clearNode(node->right);
 							 _alloc.destroy(static_cast<pair<const Key, T>* >(node->val));
 							 _alloc.deallocate(static_cast<pair<const Key, T>* >(node->val), 1);
 							 _nodeAlloc.destroy(node);
 							 _nodeAlloc.deallocate(node, 1);
 						 }
-						 _nodeAlloc.destroy(_leaf);
-						 _nodeAlloc.deallocate(_leaf, 1);
 					 }
 
 					 Node* getMinimum(Node* N) const
@@ -225,19 +223,6 @@ namespace ft
 							 N = G;
 							 P = N->parent;
 						 }
-						 while (_root->parent)
-							 _root = _root->parent;
-						 if (N == _root)
-						 {
-							 N->left = _leaf;
-							 N->right = _leaf;
-						 }
-						 else if (N == getMinimum(_root))
-							 N->left = _leaf;
-						 else
-							 N->right = _leaf;
-						 _leaf->left = getMaximum(_root);
-						 _leaf->right = getMinimum(_root);
 					 }
 
 					 void insertNode(const pair<const Key, T>& val)
@@ -252,6 +237,14 @@ namespace ft
 							 tree_insert(_root, NULL, val);
 							 RBT_fixInsert(searchTree(_root, val.first));
 						 }
+						 while (_root->parent)
+							 _root = _root->parent;
+						 Node *min = getMinimum(_root);
+						 Node *max = getMaximum(_root);
+						 min->left = _leaf;
+						 max->right = _leaf;
+						 _leaf->right = min;
+						 _leaf->left = max;
 					 }
 
 				 public:
@@ -344,6 +337,8 @@ namespace ft
 					 ~map()
 					 {
 						 clear();
+						 _nodeAlloc.destroy(_leaf);
+						 _nodeAlloc.deallocate(_leaf, 1);
 					 };
 
 					 // OPERATOR=
@@ -501,6 +496,7 @@ namespace ft
 					 void clear()
 					 {
 						 clearNode(_root);
+						 _root = NULL;
 					 }
 
 					 // OBSERVERS

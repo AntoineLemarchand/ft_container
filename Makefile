@@ -14,20 +14,15 @@ INCDIR			= includes includes/vector includes/stack includes/map
 
 RM				= rm -f
 
-ADDFLAGS		=
+ADDFLAGS		= -g -fsanitize=address
 
 #------------------------------------------------------------------------------#
 #                         DO NOT EDIT BELOW THIS LINE                          #
 #------------------------------------------------------------------------------#
 
 define	header
-	@printf "\e[38;5;2m\n"
-	@printf "███▓▒░\e[38;5;0m $1 \e[38;5;2m░▒▓███\n"
-	@printf "██▓▒░\e[38;5;0m  $1  \e[38;5;2m░▒▓██\n"
-	@printf "█▓▒░\e[38;5;12m   $1   \e[38;5;2m░▒▓█\n"
-	@printf "██▓▒░\e[38;5;0m  $1  \e[38;5;2m░▒▓██\n"
-	@printf "███▓▒░\e[38;5;0m $1 \e[38;5;2m░▒▓███\n"
-	@printf "\e[48;5;0m\e[38;5;15m"
+	@printf "\e[38;5;12m$1\n"
+	@printf "\e[38;5;15m"
 endef
 
 define	subheader
@@ -44,7 +39,7 @@ SRC				= $(addsuffix $(SRCTYPE), $(addprefix $(SRCDIR), $(SRCFILES)))
 INC				= $(addprefix -I, $(INCDIR))
 
 CXX				= $(if $(filter-out .cpp, $(SRCTYPE)), cc, c++)
-CXXFLAGS		= -Wall -Wextra -Werror -g
+CXXFLAGS		= -Wall -Wextra -Werror
 CXXFLAGS		+= $(if $(filter-out .cpp, $(SRCTYPE)),, -std=c++98)
 CXXFLAGS		+= $(ADDFLAGS)
 
