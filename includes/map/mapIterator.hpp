@@ -93,24 +93,6 @@ namespace ft
 				// PRE/POST INCREMENT
 				mapIterator operator ++ ( void )
 				{
-					if (_current->right)
-					{
-						_current = _current->right;
-						while (_current->left)
-							_current = _current->left;
-					}
-					else if (_current->parent)
-					{
-						if (_current->parent->left == _current)
-							_current = _current->parent;
-						else
-							_current = _current->parent->parent;
-					}
-					return(*this);
-				}
-
-				mapIterator& operator ++ ( int )
-				{
 					mapIterator	tmp(*this);
 
 					if (_current->right)
@@ -127,6 +109,24 @@ namespace ft
 							_current = _current->parent->parent;
 					}
 					return (tmp);
+				}
+
+				mapIterator& operator ++ ( int )
+				{
+					if (_current->right)
+					{
+						_current = _current->right;
+						while (_current->left)
+							_current = _current->left;
+					}
+					else if (_current->parent)
+					{
+						if (_current->parent->left == _current)
+							_current = _current->parent;
+						else
+							_current = _current->parent->parent;
+					}
+					return(*this);
 				}
 
 				// PRE/POST DECREMENT

@@ -225,6 +225,8 @@ namespace ft
 							 N = G;
 							 P = N->parent;
 						 }
+						 while (_root->parent)
+							 _root = _root->parent;
 						 if (N == _root)
 						 {
 							 N->left = _leaf;
@@ -241,6 +243,8 @@ namespace ft
 					 void insertNode(const pair<const Key, T>& val)
 					 {
 						 _size++;
+						 while (_root && _root->parent)
+							 _root = _root->parent;
 						 if (!_root)
 							 tree_insert(_root, NULL, val);
 						 else
@@ -361,7 +365,7 @@ namespace ft
 					 // ITERATORS
 					 iterator begin()
 					 {
-						 return (iterator(getMinimum(_root)));
+						 return (iterator(*getMinimum(_root)));
 					 }
 
 					 const_iterator begin() const

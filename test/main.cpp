@@ -21,7 +21,7 @@ void print2DUtil(ft::Node<std::pair<int, int> > *root, int space)
 		std::cout<<" ";
 	if (root->parent)
 		std::cout<< (root->parent && root->parent->left == root ? "┗" : "┏");
-	std::cout << (root->color ? "\033[1;40m" : "\033[1;41m") <<root->val.first
+	std::cout << (root->color ? "\033[1;40m" : "\033[1;41m") <<root->val.first << ":" << root->val.second
 		<< "\033[0m";
 	std::cout << "[";
 	if (root->parent)

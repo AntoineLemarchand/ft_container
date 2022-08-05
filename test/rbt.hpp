@@ -208,6 +208,7 @@ namespace ft
 						N = G;
 						P = N->parent;
 					}
+					_root->color = 1;
 				}
 
 				void	RBT_delNode(node_type* N)

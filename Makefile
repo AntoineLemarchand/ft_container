@@ -1,59 +1,66 @@
-define compiling
-	@printf 'Compiling %s\n' $1
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $1 -o $2
-endef
+#------------------------------------------------------------------------------#
+#                         EDIT THIS BLOCK                                      #
+#------------------------------------------------------------------------------#
 
-define finishing
-	@printf 'Finishing %s\n' $1
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) $2 -o $1 $(LIBS)
-endef
+NAME			= 	compare_containers
 
-define cleaning
-	@echo -n Cleaning
-	@printf '%s\n' $1
-	@make $2 -sC $1 > /dev/null
-endef
+# src definition
+SRCDIR			= 	srcs/
+# this is to define which compiler to use
+SRCTYPE			=	.cpp
+SRCFILES		=	unitTest main
 
-define removing
-	@printf ' %s ' $1
-	@$(RM) $1 > /dev/null
-	@printf '\n'
-endef
-
-SRCS			= $(addprefix srcs/, \
-						unitTest.cpp \
-						main.cpp \
-					)
-
-OBJS			= $(SRCS:.cpp=.o)
-
-NAME			= compare_containers
+INCDIR			= includes includes/vector includes/stack includes/map
 
 RM				= rm -f
 
-CXX				= c++
+ADDFLAGS		=
 
-CXXFLAGS		= -Wall -Wextra -Werror -g -std=c++98 -fsanitize=address
+#------------------------------------------------------------------------------#
+#                         DO NOT EDIT BELOW THIS LINE                          #
+#------------------------------------------------------------------------------#
 
-CPPFLAGS		= -I includes \
-				  -I includes/vector \
-				  -I includes/stack \
-				  -I includes/map
+define	header
+	@printf "\e[38;5;2m┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+	@printf "┃ \e[38;5;12m $1\n"
+	@printf "\e[38;5;2m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+	@printf "\e[38;5;15m"
+endef
 
-%.o : %.cpp
-				$(call compiling,$<,$(<:.cpp=.o),0)
+define	subheader
+	@printf "\e[38;5;5m$1\n"
+	@printf "\e[38;5;15m"
+endef
+
+#------------------------------------------------------------------------------#
+#                         UTILS PART				                           #
+#------------------------------------------------------------------------------#
+
+OBJS			= $(SRC:$(SRCTYPE)=.o)
+SRC				= $(addsuffix $(SRCTYPE), $(addprefix $(SRCDIR), $(SRCFILES)))
+INC				= $(addprefix -I, $(INCDIR))
+
+CXX				= $(if $(filter-out .cpp, $(SRCTYPE)), cc, c++)
+CXXFLAGS		= -Wall -Wextra -Werror -g
+CXXFLAGS		+= $(if $(filter-out .cpp, $(SRCTYPE)),, -std=c++98)
+CXXFLAGS		+= $(ADDFLAGS)
+
+%.o : %$(SRCTYPE)
+				$(call subheader,building $<)
+				$(CXX) $(CXXFLAGS) $(INC) -c $< -o $(<:.cpp=.o)
 
 ${NAME}:		$(OBJS)
-				$(call finishing,$(NAME), $(OBJS))
+				$(call header, building $(NAME))
+				$(CXX) $(CXXFLAGS) $(INC) $(OBJS) -o $(NAME) $(LIBS)
 
 all:			$(NAME)
 
 clean:	
-				@echo -n Removing
-				$(call removing,$(OBJS))
+				$(call subheader,removing .o files)
+				$(RM) $(OBJS)
 
 fclean:			clean
-				@echo -n Removing
-				$(call removing,$(NAME))
+				$(call subheader,removing $(NAME))
+				$(RM) $(NAME)
 
 re:				fclean all
