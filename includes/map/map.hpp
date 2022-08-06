@@ -2,7 +2,7 @@
 
 #include "mapIterator.hpp"
 #include "../utils/pair.hpp"
-#include <iostream>
+#include "../utils/lexicographical_compare.hpp"
 
 namespace ft
 {
@@ -177,9 +177,9 @@ namespace ft
 							 root->left = tree_insert(root->left, root, val);
 						 return (root);
 					 }
-					 
+
 					 //source
-			 //https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
+					 //https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
 					 void	RBT_fixInsert(Node* N)
 					 {
 						 Node* P = N->parent; //parent
@@ -289,6 +289,14 @@ namespace ft
 						 Compare comp;
 						 value_compare (Compare c) : comp(c) {}
 						 public:
+						 value_compare() {}
+						 value_compare(const value_compare& vc) {(void)vc;}
+						 value_compare& operator = (const value_compare& vc)
+						 {
+							 (void)vc;
+							 return *this;
+						 }
+						 ~value_compare() {}
 						 typedef bool result_type;
 						 typedef value_type first_argument_type;
 						 typedef value_type second_argument_type;
@@ -436,7 +444,8 @@ namespace ft
 
 						 while (k)
 							 ret++;
-						 return (*ret);
+						 return (ret->second);
+
 					 }
 
 					 // MODIFIERS
@@ -445,33 +454,43 @@ namespace ft
 						 Node*	N;
 						 bool	is_inserted;
 
-						 N = searchTree(_root, val->first);
+						 N = searchTree(_root, val.first);
 						 if (!N)
 						 {
 							 insertNode(val);
 							 is_inserted = true;
-							 N = searchTree(_root, val->first);
+							 N = searchTree(_root, val.first);
 						 }
 						 else
 							 is_inserted = false;
-						 return (make_pair(iterator(N->val), is_inserted));
+						 return (ft::make_pair(iterator(*searchTree(_root, val.first)), is_inserted));
 					 }
 
 					 iterator insert (iterator position, const value_type& val)
 					 {
 						 Node*	N;
 
-						 N = searchTree(position, val->first);
-						 if (!N)
-							 N = searchTree(_root, val->first);
-						 if (!N)
+						 if (position != end() && position->first < val.first)
+						 {
+							 while (position != end()
+									 && position->first < val.first)
+								 position++;
+						 }
+						 else if (position != end()
+								 && position->first > val.first)
+						 {
+							 while (position != end()
+									 && position->first > val.first)
+								 position--;
+						 }
+						 if (position == end() || position->first != val.first)
 						 {
 							 insertNode(val);
-							 N = searchTree(position, val->first);
-							 if (!N)
-								 N = searchTree(_root, val->first);
+							 N = searchTree(_root, val.first);
+							 return (*N);
 						 }
-						 return (iterator(N->val));
+						 else
+							 return (position);
 					 }
 
 					 template <class InputIterator>
@@ -483,7 +502,7 @@ namespace ft
 
 					 void erase (iterator position)
 					 {
-						 deleteNode(searchTree(_root, *position.first));
+						 deleteNode(searchTree(_root, position->first));
 					 }
 
 					 size_type erase (const key_type& k)
@@ -500,7 +519,7 @@ namespace ft
 					 void erase (iterator first, iterator last)
 					 {
 						 for (iterator it = first; it != last; it++)
-							 deleteNode(searchTree(_root, *it.first));
+							 deleteNode(searchTree(_root, it->first));
 					 }
 
 					 void swap (map& x)
@@ -522,8 +541,7 @@ namespace ft
 
 					 value_compare value_comp() const
 					 {
-						 value_compare	ret;
-						 return (ret);
+						 return (value_compare());
 					 }
 
 					 // OPERATIONS
@@ -534,7 +552,7 @@ namespace ft
 						 ret = searchTree(_root, k);
 						 if (!ret)
 							 return (end());
-						 return (iterator(ret));
+						 return (iterator(*ret));
 					 }
 
 					 const_iterator find (const key_type& k) const
@@ -544,7 +562,7 @@ namespace ft
 						 ret = searchTree(_root, k);
 						 if (!ret)
 							 return (end());
-						 return (const_iterator(ret));
+						 return (const_iterator(*ret));
 					 }
 
 					 size_type count (const key_type& k) const
@@ -614,9 +632,9 @@ namespace ft
 
 					 pair<const_iterator,const_iterator> equal_range
 						 (const key_type& k) const
-					 {
-						 return(make_pair(lower_bound(k), upper_bound(k)));
-					 }
+						 {
+							 return(make_pair(lower_bound(k), upper_bound(k)));
+						 }
 
 					 pair<iterator,iterator>	equal_range (const key_type& k)
 					 {
@@ -630,4 +648,59 @@ namespace ft
 					 }
 
 			 };
+
+	template< class Key, class T, class Compare, class Alloc >
+		bool operator==( const map<Key,T,Compare,Alloc>& lhs,
+				const map<Key,T,Compare,Alloc>& rhs )
+		{
+			if (lhs.size() != rhs.size())
+				return (0);
+			mapIterator<const pair<const Key, T> > left(lhs.begin());
+			mapIterator<const pair<const Key, T> > right(lhs.end());
+
+			while (left != lhs.end() && *left == *right)
+			{
+				left++;
+				right++;
+			}
+			if (left == lhs.end())
+				return (1);
+			return (0);
+		}
+
+	template< class Key, class T, class Compare, class Alloc >
+		bool operator!=( const map<Key,T,Compare,Alloc>& lhs,
+				const map<Key,T,Compare,Alloc>& rhs )
+		{
+			return (!(lhs == rhs));
+		}
+
+	template< class Key, class T, class Compare, class Alloc >
+		bool operator<( const map<Key,T,Compare,Alloc>& lhs,
+				const map<Key,T,Compare,Alloc>& rhs )
+		{
+			return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
+						rhs.begin(), rhs.end()));
+		}
+
+	template< class Key, class T, class Compare, class Alloc >
+		bool operator<=( const map<Key,T,Compare,Alloc>& lhs,
+				const map<Key,T,Compare,Alloc>& rhs )
+		{
+			return (lhs < rhs || lhs == rhs);
+		}
+
+	template< class Key, class T, class Compare, class Alloc >
+		bool operator>( const map<Key,T,Compare,Alloc>& lhs,
+				const map<Key,T,Compare,Alloc>& rhs )
+		{
+			return (!(lhs <= rhs));
+		}
+
+	template< class Key, class T, class Compare, class Alloc >
+		bool operator>=( const map<Key,T,Compare,Alloc>& lhs,
+				const map<Key,T,Compare,Alloc>& rhs )
+		{
+			return (lhs > rhs || lhs == rhs);
+		}
 }

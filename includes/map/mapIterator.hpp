@@ -9,7 +9,7 @@ namespace ft
 		struct Node*	left;
 		struct Node*	right;
 		void*			val;
-		int				color;
+		short			color;
 
 		Node()
 		{
