@@ -75,15 +75,15 @@ namespace ft
 				// COMPARISON
 				bool	operator == (const mapIterator<const value_type>& it)
 					const
-				{
-					return (_current == it.getCurrent());
-				}
+					{
+						return (_current == it.getCurrent());
+					}
 
 				bool	operator != (const mapIterator<const value_type>& it)
 					const
-				{
-					return (!(*this == it));
-				}
+					{
+						return (!(*this == it));
+					}
 
 				bool	operator == (const mapIterator<value_type>& it)
 				{
@@ -109,7 +109,29 @@ namespace ft
 				// OPERATIONS
 
 				// PRE/POST INCREMENT
-				mapIterator operator ++ ( void )
+				mapIterator& operator ++ ( void )
+				{
+					const Node*	prev;
+
+					if (_current->right)
+					{
+						prev = _current;
+						_current = _current->right;
+						if (_current->val != NULL && prev->val != NULL)
+							while (_current->left)
+								_current = _current->left;
+					}
+					else
+					{
+						while (_current->parent
+								&& _current == _current->parent->right)
+							_current = _current->parent;
+						_current = _current->parent;
+					}
+					return(*this);
+				}
+
+				mapIterator operator ++ ( int )
 				{
 					mapIterator	tmp(*this);
 					const Node*		prev;
@@ -132,29 +154,29 @@ namespace ft
 					return (tmp);
 				}
 
-				mapIterator& operator ++ ( int )
+				// PRE/POST DECREMENT
+				mapIterator& operator -- ( void )
 				{
 					const Node*	prev;
 
-					if (_current->right)
+					if (_current->left)
 					{
 						prev = _current;
-						_current = _current->right;
+						_current = _current->left;
 						if (_current->val != NULL && prev->val != NULL)
-							while (_current->left)
-								_current = _current->left;
+							while (_current->right)
+								_current = _current->right;
 					}
 					else
 					{
 						while (_current->parent
-								&& _current == _current->parent->right)
+								&& _current == _current->parent->left)
 							_current = _current->parent;
 						_current = _current->parent;
 					}
 					return(*this);
 				}
 
-				// PRE/POST DECREMENT
 				mapIterator operator -- ( int )
 				{
 					mapIterator	tmp(*this);
@@ -176,28 +198,6 @@ namespace ft
 						_current = _current->parent;
 					}
 					return (tmp);
-				}
-
-				mapIterator& operator -- ( void )
-				{
-					const Node*	prev;
-
-					if (_current->left)
-					{
-						prev = _current;
-						_current = _current->left;
-						if (_current->val != NULL && prev->val != NULL)
-							while (_current->right)
-								_current = _current->right;
-					}
-					else
-					{
-						while (_current->parent
-								&& _current == _current->parent->left)
-							_current = _current->parent;
-						_current = _current->parent;
-					}
-					return(*this);
 				}
 
 				const Node*	getCurrent() const
@@ -248,11 +248,11 @@ namespace ft
 
 				reverse_mapIterator<T>& operator =
 					( const reverse_mapIterator<T>& rit)
-				{
-					if (this != &rit)
-						_it = rit.base();
-					return (*this);
-				}
+					{
+						if (this != &rit)
+							_it = rit.base();
+						return (*this);
+					}
 
 				// DEREFERENCE
 				mapIterator<T> base() const
@@ -275,39 +275,39 @@ namespace ft
 				// COMPARISON
 				bool	operator ==
 					(const reverse_mapIterator<const value_type>& it) const
-				{
-					return (_it == it.base());
-				}
+					{
+						return (_it == it.base());
+					}
 
 				bool	operator !=
 					(const reverse_mapIterator<const value_type>& it) const
-				{
-					return (_it != it.base());
-				}
+					{
+						return (_it != it.base());
+					}
 
 				bool	operator <
 					(const reverse_mapIterator<const value_type>& it) const
-				{
-					return (_it > it.base());
-				}
+					{
+						return (_it > it.base());
+					}
 
 				bool	operator <=
 					(const reverse_mapIterator<const value_type>& it) const
-				{
-					return (_it >= it.base());
-				}
+					{
+						return (_it >= it.base());
+					}
 
 				bool	operator >
 					(const reverse_mapIterator<const value_type>& it) const
-				{
-					return (_it < it.base());
-				}
+					{
+						return (_it < it.base());
+					}
 
 				bool	operator >=
 					(const reverse_mapIterator<const value_type>& it) const
-				{
-					return (_it <= it.base());
-				}
+					{
+						return (_it <= it.base());
+					}
 
 				// PRE/POST INCREMENT
 				reverse_mapIterator<T>& operator ++ ( void )

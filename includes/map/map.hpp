@@ -169,10 +169,10 @@ namespace ft
 								 _root = root;
 						 }
 						 else if (!_comp(val.first, static_cast<value_type*>
-								 (root->val)->first))
+									 (root->val)->first))
 							 root->right = tree_insert(root->right, root, val);
 						 else if (_comp(val.first, static_cast<value_type*>
-								 (root->val)->first))
+									 (root->val)->first))
 							 root->left = tree_insert(root->left, root, val);
 						 return (root);
 					 }
@@ -229,7 +229,7 @@ namespace ft
 					 void insertNode(const pair<const Key, T>& val)
 					 {
 						 _size++;
-							 tree_insert(_root, NULL, val);
+						 tree_insert(_root, NULL, val);
 						 if (_size > 1)
 							 RBT_fixInsert(searchTree(_root, val.first));
 						 while (_root && _root->parent)
@@ -440,25 +440,25 @@ namespace ft
 					 mapped_type& operator[] (const key_type& k)
 					 {
 						 return ((insert(ft::make_pair(k, mapped_type())).first)
-							 ->second);
+								 ->second);
 					 }
 
 					 // MODIFIERS
 					 pair<iterator,bool> insert (const value_type& val)
 					 {
-						 Node*	N;
-						 bool	is_inserted;
+						 iterator	inserted_here;
+						 bool		is_inserted;
 
-						 N = searchTree(_root, val.first);
-						 if (!N || N == _leaf)
+						 inserted_here = find(val.first);
+						 if (inserted_here == end())
 						 {
 							 insertNode(val);
 							 is_inserted = true;
-							 N = searchTree(_root, val.first);
+							 inserted_here = find(val.first);
 						 }
 						 else
 							 is_inserted = false;
-						 return (ft::make_pair(iterator(*N), is_inserted));
+						 return (ft::make_pair(inserted_here, is_inserted));
 					 }
 
 					 iterator insert (iterator position, const value_type& val)
@@ -492,7 +492,7 @@ namespace ft
 						 void insert (InputIterator first, InputIterator last)
 						 {
 							 for (InputIterator it = first; it != last; it++)
-								 insertNode(*it);
+								 insert(*it);
 						 }
 
 					 void erase (iterator position)
@@ -519,7 +519,31 @@ namespace ft
 
 					 void swap (map& x)
 					 {
-						 (void)x;
+
+						 typename Alloc::template rebind<Node >::other
+							 nodeAlloc_tmp = _nodeAlloc;
+						 Alloc
+							 alloc_tmp = _alloc;
+						 Compare
+							 comp_tmp = _comp;
+						 size_type
+							 size_tmp = _size;
+						 Node*
+							 root_tmp = _root;
+						 Node*
+							 leaf_tmp = _leaf;
+
+						 _alloc = x._alloc;
+						 _comp = x._comp;
+						 _size = x._size;
+						 _root = x._root;
+						 _leaf = x._leaf;
+
+						 x._alloc = alloc_tmp;
+						 x._comp = comp_tmp;
+						 x._size = size_tmp;
+						 x._root = root_tmp;
+						 x._leaf = leaf_tmp;
 					 }
 
 					 void clear()
@@ -634,7 +658,7 @@ namespace ft
 			if (lhs.size() != rhs.size())
 				return (0);
 			mapIterator<const pair<const Key, T> > left(lhs.begin());
-			mapIterator<const pair<const Key, T> > right(lhs.end());
+			mapIterator<const pair<const Key, T> > right(rhs.begin());
 
 			while (left != lhs.end() && *left == *right)
 			{
