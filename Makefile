@@ -12,7 +12,7 @@ INCDIR				= includes includes/vector includes/stack includes/map
 
 RM					= rm -f
 
-ADDITIONNALFLAGS	= -g #-fsanitize=address
+ADDITIONNALFLAGS	= -g#-fsanitize=address
 
 #------------------------------------------------------------------------------#
 #                         DO NOT EDIT BELOW THIS LINE                          #
@@ -27,10 +27,6 @@ define	subheader
 	@printf "\e[38;5;5m$1\n"
 	@printf "\e[38;5;15m"
 endef
-
-#------------------------------------------------------------------------------#
-#                         UTILS PART				                           #
-#------------------------------------------------------------------------------#
 
 OBJS			= $(SRC:$(SRCTYPE)=.o)
 SRC				= $(addsuffix $(SRCTYPE), $(addprefix $(SRCDIR), $(SRCFILES)))

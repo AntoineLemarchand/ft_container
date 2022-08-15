@@ -10,7 +10,7 @@ namespace ft
 			 class Alloc = std::allocator<pair<const Key,T> > > class map
 			 {
 				 private:
-					 std::allocator<Node> _nodeAlloc;
+					 typename Alloc::template rebind<Node >::other	_nodeAlloc;
 					 Alloc			_alloc;
 					 Compare		_comp;
 					 std::size_t	_size;
@@ -56,7 +56,7 @@ namespace ft
 								 || static_cast<value_type*>
 								 (root->val)->first == key)
 							 return (root);
-						 if (static_cast<value_type*>(root->val)->first < key)
+						 if (_comp(static_cast<value_type*>(root->val)->first, key))
 							 return (searchTree(root->right, key));
 						 return (searchTree(root->left, key));
 					 }
@@ -159,9 +159,8 @@ namespace ft
 					 {
 						 if (!root || root == _leaf)
 						 {
-							 Node tmp;
 							 root = _nodeAlloc.allocate(1);
-							 _nodeAlloc.construct(root, tmp);
+							 _nodeAlloc.construct(root, Node());
 							 root->val = _alloc.allocate(1);
 							 _alloc.construct(static_cast<value_type*>
 									 (root->val), val);
@@ -169,11 +168,11 @@ namespace ft
 							 if (!_root)
 								 _root = root;
 						 }
-						 else if (val.first > static_cast<value_type*>
-								 (root->val)->first)
+						 else if (!_comp(val.first, static_cast<value_type*>
+								 (root->val)->first))
 							 root->right = tree_insert(root->right, root, val);
-						 else if (val.first < static_cast<value_type*>
-								 (root->val)->first)
+						 else if (_comp(val.first, static_cast<value_type*>
+								 (root->val)->first))
 							 root->left = tree_insert(root->left, root, val);
 						 return (root);
 					 }
@@ -230,13 +229,9 @@ namespace ft
 					 void insertNode(const pair<const Key, T>& val)
 					 {
 						 _size++;
-						 if (_root)
-						 {
 							 tree_insert(_root, NULL, val);
+						 if (_size > 1)
 							 RBT_fixInsert(searchTree(_root, val.first));
-						 }
-						 else
-							 tree_insert(_root, NULL, val);
 						 while (_root && _root->parent)
 							 _root = _root->parent;
 						 Node *min = getMinimum(_root);
@@ -383,11 +378,15 @@ namespace ft
 					 // ITERATORS
 					 iterator begin()
 					 {
+						 if (!_size)
+							 return (end());
 						 return (*_leaf->right);
 					 }
 
 					 const_iterator begin() const
 					 {
+						 if (!_size)
+							 return (end());
 						 return (*_leaf->right);
 					 }
 
@@ -440,12 +439,8 @@ namespace ft
 					 // ELEMENT ACCESS
 					 mapped_type& operator[] (const key_type& k)
 					 {
-						 iterator	ret = begin();
-
-						 while (k)
-							 ret++;
-						 return (ret->second);
-
+						 return ((insert(ft::make_pair(k, mapped_type())).first)
+							 ->second);
 					 }
 
 					 // MODIFIERS
@@ -455,7 +450,7 @@ namespace ft
 						 bool	is_inserted;
 
 						 N = searchTree(_root, val.first);
-						 if (!N)
+						 if (!N || N == _leaf)
 						 {
 							 insertNode(val);
 							 is_inserted = true;
@@ -463,7 +458,7 @@ namespace ft
 						 }
 						 else
 							 is_inserted = false;
-						 return (ft::make_pair(iterator(*searchTree(_root, val.first)), is_inserted));
+						 return (ft::make_pair(iterator(*N), is_inserted));
 					 }
 
 					 iterator insert (iterator position, const value_type& val)
@@ -530,6 +525,7 @@ namespace ft
 					 void clear()
 					 {
 						 clearNode(_root);
+						 _size = 0;
 						 _root = NULL;
 					 }
 
@@ -576,12 +572,7 @@ namespace ft
 					 {
 						 iterator	ret = begin();
 
-						 if (static_cast<value_type*>
-								 (_leaf->left->val)->first < k)
-							 return (end());
-						 while (ret->first < k
-								 && *ret != *static_cast<value_type*>
-								 (_leaf->right->val))
+						 while (ret != end() && _comp(ret->first, k))
 							 ret++;
 						 return (ret);
 					 }
@@ -590,43 +581,30 @@ namespace ft
 					 {
 						 const_iterator	ret = begin();
 
-						 if (static_cast<value_type*>
-								 (_leaf->left->val)->first < k)
-							 return (end());
-						 while (ret->first < k
-								 && *ret != *static_cast<value_type*>
-								 (_leaf->right->val))
+						 while (ret != end() && _comp(ret->first, k))
 							 ret++;
 						 return (ret);
 					 }
 
 					 iterator upper_bound (const key_type& k)
 					 {
-						 iterator ret = end();
-						 ret--;
-
-						 if (static_cast<value_type*>
-								 (_leaf->right->val)->first >= k)
-							 return (end());
-						 while (ret->first >= k
-								 && *ret != *static_cast<value_type*>
-								 (_leaf->left->val))
-							 ret--;
+						 iterator ret = lower_bound(k);
+						 if (ret == end()
+								 || (_comp(k, ret->first)
+									 && !_comp(ret->first, k)))
+							 return (ret);
+						 ret++;
 						 return (ret);
 					 }
 
 					 const_iterator upper_bound (const key_type& k) const
 					 {
-						 const_iterator ret = end();
-						 ret--;
-
-						 if (static_cast<value_type*>
-								 (_leaf->left->val)->first >= k)
-							 return (end());
-						 while (ret->first >= k
-								 && *ret != *static_cast<value_type*>
-								 (_leaf->left->val))
-							 ret--;
+						 const_iterator ret = lower_bound(k);
+						 if (ret == end()
+								 || (_comp(k, ret->first)
+									 && !_comp(ret->first, k)))
+							 return (ret);
+						 ret++;
 						 return (ret);
 					 }
 

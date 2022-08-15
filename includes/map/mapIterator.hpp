@@ -9,7 +9,7 @@ namespace ft
 		struct Node*	left;
 		struct Node*	right;
 		void*			val;
-		short			color;
+		std::size_t		color;
 
 		Node()
 		{
@@ -98,7 +98,7 @@ namespace ft
 				// DEREFERENCING
 				reference operator * ( void ) const
 				{
-					return (*(static_cast<value_type*>(_current->val)));
+					return (*static_cast<value_type*>(_current->val));
 				}
 
 				pointer operator -> ( void ) const
@@ -118,7 +118,7 @@ namespace ft
 					{
 						prev = _current;
 						_current = _current->right;
-						if (_current->color != 2 && prev->color != 2)
+						if (_current->val != NULL && prev->val != NULL)
 							while (_current->left)
 								_current = _current->left;
 					}
@@ -140,7 +140,7 @@ namespace ft
 					{
 						prev = _current;
 						_current = _current->right;
-						if (_current->color != 2 && prev->color != 2)
+						if (_current->val != NULL && prev->val != NULL)
 							while (_current->left)
 								_current = _current->left;
 					}
@@ -164,7 +164,7 @@ namespace ft
 					{
 						prev = _current;
 						_current = _current->left;
-						if (_current->color != 2 && prev->color != 2)
+						if (_current->val != NULL && prev->val != NULL)
 							while (_current->right)
 								_current = _current->right;
 					}
@@ -186,7 +186,7 @@ namespace ft
 					{
 						prev = _current;
 						_current = _current->left;
-						if (_current->color != 2 && prev->color != 2)
+						if (_current->val != NULL && prev->val != NULL)
 							while (_current->right)
 								_current = _current->right;
 					}
