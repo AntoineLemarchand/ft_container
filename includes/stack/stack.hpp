@@ -19,16 +19,6 @@ namespace ft
 				this->c = ctnr;
 			}
 
-			// DESTRUCTOR
-			~stack() {};
-
-			stack& operator=( const stack& other )
-			{
-				if (this != &other)
-					this->c = other.c;
-				return (*this);
-			}
-
 			// MEMBER FUNCTIONS
 			bool empty() const
 			{

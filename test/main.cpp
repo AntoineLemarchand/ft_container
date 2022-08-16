@@ -6,7 +6,7 @@
 
 #define COUNT 2
 
-void print2DUtil(ft::Node<std::pair<int, int> > *root, int space)
+void print2DUtil(ft::Node<std::pair<int, std::string> > *root, int space)
 {
 	// Base case
 	if (root == NULL)
@@ -36,7 +36,7 @@ void print2DUtil(ft::Node<std::pair<int, int> > *root, int space)
 }
 
 // Wrapper over print2DUtil()
-void print2D(ft::Node<std::pair<int, int> > *root)
+void print2D(ft::Node<std::pair<int, std::string> > *root)
 {
 	// Pass initial space count as 0
 	std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << std::endl;
@@ -47,22 +47,14 @@ void print2D(ft::Node<std::pair<int, int> > *root)
 #include <list>
 int main ( void )
 {
-	ft::redBlackTree<int, int> tr;
+	ft::redBlackTree<int, std::string> tr;
 
-	std::list<std::pair<int, int> > lst;
-	unsigned int lst_size = 10;
-	for (unsigned int i = 0; i < lst_size; ++i)
-		lst.push_back(std::pair<int, int>(i + 1, (i + 1) * 3));
-	for (std::list<std::pair<int, int> >::iterator it = lst.begin(); it !=lst.end(); it++)
+	std::list<std::pair<int, std::string> > lst;
+	for (unsigned int i = 0; i < 10; ++i)
+		lst.push_back(std::pair<int, std::string>(i, std::string((10 - i), i + 65)));
+	for (std::list<std::pair<int, std::string> >::iterator it = lst.begin(); it !=lst.end(); it++)
 		tr.insertNode(*it);
 	print2D(tr.getRoot());
-	tr.deleteNode(tr.getRoot()->right);
-	print2D(tr.getRoot());
-	tr.deleteNode(tr.getRoot()->right);
-	print2D(tr.getRoot());
-	tr.deleteNode(tr.getRoot()->right);
-	print2D(tr.getRoot());
-	tr.deleteNode(tr.getRoot()->right);
 	print2D(tr.getRoot());
 	/*
 	for (std::string line; std::getline(std::cin, line);) {

@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 
 #include "mapIterator.hpp"
 #include "../utils/pair.hpp"
@@ -112,44 +113,63 @@ namespace ft
 					 }
 
 					 // NODE DELETION
-					 void shiftNode(Node* to, Node* from)
+					 void swapVal(Node* n1, Node* n2)
 					 {
-						 if (from->parent)
-						 {
-							 if (from->parent->right == from)
-								 from->parent->right = NULL;
-							 else
-								 from->parent->left = NULL;
-						 }
-						 to->val = from->val;
-						 _nodeAlloc.destroy(from);
-						 _nodeAlloc.deallocate(from, 1);
+						 void* tmp = n1->val;
+						 n1->val = n2->val;
+						 n2->val = tmp;
 					 }
 
-					 //using
-					 //https://medium.com/analytics-vidhya/deletion-in-red-black-rb-tree-92301e1474ea
+					 void moveUp(Node* n, Node* nchild)
+					 {
+						 nchild->color = 1;
+						 if (!n->parent)
+							 _root = nchild;
+						 else if (n->parent->right == n)
+							 n->parent->right = nchild;
+						 else
+							 n->parent->left = nchild;
+						 n->left = NULL;
+						 n->right = NULL;
+						 clearNode(n);
+					 }
+
+					 // https://www.usna.edu/Users/cs/crabbe/SI321/current/red-black/red-black.html
 					 void deleteNode(Node* N)
 					 {
 						 if (!N)
 							 return;
-						 // if node is red, perform a classic bst delete
-						 if (N->right && N->left)
-							 shiftNode(N, getMinimum(N->right));
-						 else if (N->right)
-							 shiftNode(N, N->right);
-						 else if (N->left)
-							 shiftNode(N, N->left);
-						 else
+						 if (N->right)
 						 {
-							 if (!N->parent)
-								 _root = NULL;
-							 if (N->parent->left == N)
-								 N->parent->left = NULL;
-							 else
-								 N->parent->right = NULL;
-							 _nodeAlloc.destroy(N);
-							 _nodeAlloc.deallocate(N, 1);
+							 swapVal(N, getMinimum(N->right));
+							 N = getMinimum(N->right);
+							 if (N->right)
+								 moveUp(N, N->right);
 						 }
+						 else if (N->left)
+						 {
+							 swapVal(N, getMaximum(N->left));
+							 N = getMaximum(N->left);
+							 if (N->left)
+								 moveUp(N, N->left);
+						 }
+						 if (!N->parent)
+						 {
+							 _root = NULL;
+							 return;
+						 }
+						 if (N->parent->right == N)
+							 N->parent->right = NULL;
+						 else
+							 N->parent->left = NULL;
+						 while (_root && _root->parent)
+							 _root = _root->parent;
+						 Node *min = getMinimum(_root);
+						 Node *max = getMaximum(_root);
+						 min->left = _leaf;
+						 max->right = _leaf;
+						 _leaf->right = min;
+						 _leaf->left = max;
 					 }
 
 					 // NODE INSERTION
@@ -502,36 +522,30 @@ namespace ft
 
 					 size_type erase (const key_type& k)
 					 {
-						 Node*	toDel;
+						 iterator	toDel = find(k);
 
-						 toDel = searchTree(_root, k);
-						 if (!toDel)
+						 if (toDel == end())
 							 return (0);
-						 deleteNode(toDel);
+						 erase(toDel);
 						 return (1);
 					 }
 
 					 void erase (iterator first, iterator last)
 					 {
 						 for (iterator it = first; it != last; it++)
-							 deleteNode(searchTree(_root, it->first));
+							 erase(it);
 					 }
 
 					 void swap (map& x)
 					 {
 
 						 typename Alloc::template rebind<Node >::other
-							 nodeAlloc_tmp = _nodeAlloc;
-						 Alloc
-							 alloc_tmp = _alloc;
-						 Compare
-							 comp_tmp = _comp;
-						 size_type
-							 size_tmp = _size;
-						 Node*
-							 root_tmp = _root;
-						 Node*
-							 leaf_tmp = _leaf;
+									nodeAlloc_tmp = _nodeAlloc;
+						 Alloc		alloc_tmp = _alloc;
+						 Compare	comp_tmp = _comp;
+						 size_type	size_tmp = _size;
+						 Node*		root_tmp = _root;
+						 Node*		leaf_tmp = _leaf;
 
 						 _alloc = x._alloc;
 						 _comp = x._comp;

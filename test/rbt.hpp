@@ -1,4 +1,4 @@
-#pragma once
+#pragma  once
 #include <utility>
 #include <stdexcept>
 #include <iostream>
@@ -121,15 +121,14 @@ namespace ft
 				void	initNode(node_type** node, node_type* parent,
 						value_type val)
 				{
-					node_type tmp;
+					node_type* tmp = new node_type;
 
-					tmp.val = val;
-					tmp.parent = parent;
-					tmp.left = NULL;
-					tmp.right = NULL;
-					tmp.color = 0;
-					*node = _alloc.allocate(1);
-					_alloc.construct(*node, tmp);
+					tmp->val = val;
+					tmp->parent = parent;
+					tmp->left = NULL;
+					tmp->right = NULL;
+					tmp->color = 0;
+					*node = tmp;
 				}
 
 				node_type*	searchTree(node_type* root, Key key)
@@ -160,8 +159,10 @@ namespace ft
 								val.first);
 					return (root);
 				}
-//source
-//https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
+				//source
+				//https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
+				// https://course.ccs.neu.edu/cs5010f17/Inheritance
+				// /jfp99redblack.pdf
 				void	RBT_fixInsert(node_type* N)
 				{
 					node_type* P = N->parent; //parent
@@ -211,32 +212,11 @@ namespace ft
 					_root->color = 1;
 				}
 
-				void	RBT_delNode(node_type* N)
-				{
-					node_type* P = N->parent; // parent
-					node_type* S; // sibling
-					node_type* C; // close nephew
-					node_type* D; // distant nephew
-				}
-
 				void insertNode(value_type val)
 				{
 					node_type* newNode = tree_insert(_root, NULL, val);
 					_size++;
 					RBT_fixInsert(searchTree(_root, val.first));
-				}
-
-				void shiftNode(node_type* to, node_type* from)
-				{
-					std::cout << "shifting " << to->val.first << " with " << from->val.first << std::endl;
-					if (from->parent)
-						if (from->parent->right == from)
-							from->parent->right = NULL;
-						else
-							from->parent->left = NULL;
-					to->val = from->val;
-					_alloc.destroy(from);
-					_alloc.deallocate(from, 1);
 				}
 
 				node_type* getMinimum(node_type* N)
@@ -246,29 +226,69 @@ namespace ft
 					return (N);
 				}
 
-//using
-//https://medium.com/analytics-vidhya/deletion-in-red-black-rb-tree-92301e1474ea
-				void deleteNode(node_type* N)
+				node_type* getMaximum(node_type* N)
 				{
-					bool	original_color = N->color;
-					// if node is red, perform a classic bst delete
-					if (N->right && N->left)
-						shiftNode(N, getMinimum(N->right));
-					else if (N->right)
-						shiftNode(N, N->right);
-					else if (N->left)
-						shiftNode(N, N->left);
+					while (N->right)
+						N = N->right;
+					return (N);
+				}
+
+				void swapval(node* n1, node* n2)
+				{
+					value_type tmp = n1->val;
+
+					n1->val = n2->val;
+					n2->val = tmp;
+				}
+
+				void moveUp(node_type* n, node_type* nchild)
+				{
+					nchild->color = 1;
+					if (!n->parent)
+						_root = nchild;
+					else if (n->parent->right == n)
+						n->parent->right = nchild;
 					else
+						n->parent->left = nchild;
+
+				}
+				// segfaulting for now
+				// https://www.usna.edu/Users/cs/crabbe/SI321/current/red-black/red-black.html
+				void deleteNode(Key key)
+				{
+					std::cout << "deleting " << key << std::endl;
+					std::size_t originalColor;
+					node_type* N = searchTree(_root, key);
+					/*
+					 * if n has childs, either swap the val with successor or
+					 * predecessor
+					 */
+					if (!N)
+						return;
+					if (N->right)
 					{
-						if (!N->parent)
-							_root = NULL;
-						if (N->parent->left == N)
-							N->parent->left = NULL;
-						else
-							N->parent->right = NULL;
-						_alloc.destroy(N);
-						_alloc.deallocate(N, 1);
+						swapVal(N, getMinimum(N->right));
+						N = getMinimum(N->right);
+						if (N->right)
+							moveUp(N, N->right);
 					}
+					else if (N->left)
+					{
+						swapVal(N, getMaximum(N->left));
+						N = getMaximum(N->left);
+						if (N->left)
+							moveUp(N, N->left);
+					}
+					if (!N->parent)
+					{
+						_root = NULL;
+						return;
+					}
+					if (N->parent->right == N)
+						N->parent->right = NULL;
+					else
+						N->parent->left = NULL;
+					originalColor = N->color;
 				}
 
 				node_type* getRoot( void )
