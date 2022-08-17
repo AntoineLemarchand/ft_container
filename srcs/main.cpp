@@ -284,4 +284,8 @@ int		main(void)
 	mp[13] = "TWO";
 	mp[14] = "THREE";
 	mp[15] = "FOUR";
+	printSize(mp);
+	ft_erase(mp, mp.begin(), mp.end());
+
+	return (0);
 }

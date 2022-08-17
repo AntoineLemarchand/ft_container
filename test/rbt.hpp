@@ -263,17 +263,22 @@ namespace ft
 
 				void RBT_delete(node_type* P, node_type* S)
 				{
+					node_type* Sl = S->left;
+					node_type* Sr = S->right;
 					// case 1
 					while (P)
 					{
-						node_type* Sl = S->left;
-						node_type* Sr = S->right;
-						std::size_t SlColor = (!Sl || Sl->color == 1);
-						std::size_t SrColor = (!Sr || Sr->color == 1);
+						if (S)
+						{
+							Sl = S->left;
+							Sr = S->right;
+						}
+						std::size_t SlColor = (!S || !Sl || Sl->color == 1);
+						std::size_t SrColor = (!S || !Sr || Sr->color == 1);
 
 						// case 2
-						if (P->color == 1 && S->color == 0
-								&& SlColor == 1	&& Sr->color == 1)
+						if (P->color == 1 && S && S->color == 0
+								&& SlColor == 1	&& SrColor == 1)
 						{
 							std::cout << "case 2" << std::endl;
 							P->color = 0;
@@ -290,7 +295,7 @@ namespace ft
 							}
 						}
 						// case 3
-						else if (P->color == 1 && S->color == 1
+						else if (P->color == 1 && (!S || S->color == 1)
 								&& SlColor == 1 && SrColor == 1)
 						{
 							std::cout << "case 3" << std::endl;
@@ -301,21 +306,23 @@ namespace ft
 							P = P->parent;
 						}
 						// case 4
-						else if (P->color == 0 && S->color == 1
+						else if (P->color == 0 && (!S || S->color == 1)
 								&& SlColor == 1 && SrColor == 1)
 						{
 							std::cout << "case 4 ×" << std::endl;
 							P->color = 1;
-							S->color = 0;
+							if (S)
+								S->color = 0;
 							break;
 						}
 						// case 5
-						else if (/*P->color == 1 && */S->color == 1
+						else if ((!S || S->color == 1)
 								&& ((S == P->right && SlColor == 0)
 									|| (S == P->left && SrColor == 0)))
 						{
 							std::cout << "case 5" << std::endl;
-							S->color = 0;
+							if (S)
+								S->color = 0;
 							if (Sr->color == 0)
 							{
 								Sr->color = 1;
@@ -348,9 +355,8 @@ namespace ft
 
 				void deleteNode(Key key)
 				{
-					std::size_t nCol;
 					node_type* N = searchTree(_root, key);
-					node_type* child;
+					std::size_t nCol;
 					node_type* P;
 					node_type* S;
 

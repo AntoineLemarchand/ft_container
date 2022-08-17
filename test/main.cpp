@@ -55,19 +55,35 @@ int main ( void )
 	for (std::list<std::pair<int, std::string> >::iterator it = lst.begin(); it !=lst.end(); it++)
 		tr.insertNode(*it);
 	tr.deleteNode(1);
+
 	tr.deleteNode(0);
 	tr.deleteNode(10);
+
 	tr.deleteNode(2);
 	tr.deleteNode(3);
 	tr.deleteNode(4);
-	tr.deleteNode(5);
-	print2D(tr.getRoot());
-	tr.deleteNode(9);
-	print2D(tr.getRoot());
-	tr.deleteNode(8);
+
 	print2D(tr.getRoot());
 	tr.deleteNode(7);
 	print2D(tr.getRoot());
+	tr.deleteNode(8);
+
+	tr.insertNode(std::make_pair(10, "Hello"));
+	tr.insertNode(std::make_pair(11, "Hi there"));
+	tr.deleteNode(9);
+	tr.deleteNode(10);
+	tr.deleteNode(11);
+	tr.insertNode(std::make_pair(12, "ONE"));
+	tr.insertNode(std::make_pair(13, "TWO"));
+	tr.insertNode(std::make_pair(14, "THREE"));
+	tr.insertNode(std::make_pair(15, "FOUR"));
+	tr.deleteNode(5);
+	tr.deleteNode(6);
+	tr.deleteNode(12);
+	tr.deleteNode(13);
+	tr.deleteNode(14);
+	tr.deleteNode(15);
+
 	/*
 	for (std::string line; std::getline(std::cin, line);) {
 		if (line[0] == 'd')

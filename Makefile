@@ -6,7 +6,7 @@
 #    By: alemarch <alemarch@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/16 14:33:53 by alemarch          #+#    #+#              #
-#    Updated: 2022/08/16 14:35:11 by alemarch         ###   ########.fr        #
+#    Updated: 2022/08/17 22:08:21 by alemarch         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 NAME				= 	compare_containers
@@ -19,7 +19,7 @@ INCDIR				= includes includes/vector includes/stack includes/map
 
 RM					= rm -f
 
-ADDITIONNALFLAGS	= -o0 -g#-fsanitize=address
+ADDITIONNALFLAGS	= -g #-fsanitize=address
 
 # **************************************************************************** # 
 #                         DO NOT EDIT BELOW THIS LINE                          #
