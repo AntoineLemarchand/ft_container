@@ -68,23 +68,27 @@ namespace ft
 					 /*  l1   r              l  r2  */
 					 /*      / \            / \   \ */
 					 /*     r1 r2          l1 r1  r2*/
-					 void	leftRotate(Node* l)
+					 void	leftRotate(Node* P)
 					 {
-						 Node*	r;
+						 Node* N = P->right;
+						 Node* tmp;
 
-						 r = l->right;
-						 if (l->parent && l->parent->right == l)
-							 l->parent->right = r;
-						 else if (l->parent)
-							 l->parent->left = r;
+						 if (N->left && N->left != _leaf)
+							 N->left->parent = P;
+						 // rotating parents
+						 N->parent = P->parent;
+						 if (!P->parent)
+							 _root = N;
+						 else if (P->parent->right == P)
+							 P->parent->right = N;
 						 else
-							 _root = r;
-						 r->parent = l->parent;
-						 l->right = r->left;
-						 if (l->right)
-							 l->right->parent = l;
-						 r->left = l;
-						 l->parent = r;
+							 P->parent->left = N;
+						 P->parent = N;
+
+						 // and childs
+						 tmp = N->left;
+						 N->left = P;
+						 P->right = tmp;
 					 }
 
 					 /* to go from           to     */
@@ -93,23 +97,27 @@ namespace ft
 					 /*   l  r2             l1   r  */
 					 /*  / \                    / \ */
 					 /* l1 l2                  l2 r2*/
-					 void	rightRotate(Node* r)
+					 void	rightRotate(Node* P)
 					 {
-						 Node*	l;
+						 Node* N = P->left;
+						 Node* tmp;
 
-						 l = r->left;
-						 if (r->parent && r->parent->right == r)
-							 r->parent->right = l;
-						 else if (r->parent)
-							 r->parent->left = l;
+						 if (N->right && N->right != _leaf)
+							 N->right->parent = P;
+						 // rotating parents
+						 N->parent = P->parent;
+						 if (!P->parent)
+							 _root = N;
+						 else if (P->parent->right == P)
+							 P->parent->right = N;
 						 else
-							 _root = l;
-						 l->parent = r->parent;
-						 r->left = l->right;
-						 if (r->left)
-							 r->left->parent = r;
-						 l->right = r;
-						 r->parent = l;
+							 P->parent->left = N;
+						 P->parent = N;
+
+						 // and childs
+						 tmp = N->right;
+						 N->right = P;
+						 P->left = tmp;
 					 }
 
 					 // NODE DELETION
@@ -120,39 +128,23 @@ namespace ft
 						 n2->val = tmp;
 					 }
 
-					 void moveUp(Node* n, Node* nchild)
-					 {
-						 nchild->color = 1;
-						 if (!n->parent)
-							 _root = nchild;
-						 else if (n->parent->right == n)
-							 n->parent->right = nchild;
-						 else
-							 n->parent->left = nchild;
-						 n->left = NULL;
-						 n->right = NULL;
-						 clearNode(n);
-					 }
-
 					 // thanks god
 					 // https://www.youtube.com/watch?v=CTvfzU_uNKE
 					 void RBT_delete(Node* P, Node* S)
 					 {
-						Node*	Sl;
-						Node*	Sr;				
-						// case 1
+						 // case 1
 						 while (P)
 						 {
-							 if (S)
-							 {
-								 Sl = S->left;
-								 Sr = S->right;
-							 }
+							 Node* Sl = S->left;
+							 Node* Sr = S->right;
+							 bool SlColor = (!Sl || Sl == _leaf || Sl->color == 1);
+							 bool SrColor = (!Sr || Sr == _leaf || Sr->color == 1);
+
 							 // case 2
-							 if (P->color == 1 && S && S->color == 0
-									 && (!Sl || Sl == _leaf || Sl->color == 1)
-									 && (!Sr || Sr == _leaf || Sr->color == 1))
+							 if (P->color == 1 && S->color == 0
+									 && SlColor == 1	&& Sr->color == 1)
 							 {
+								 std::cout << "case 2" << std::endl;
 								 P->color = 0;
 								 S->color = 1;
 								 if (S == P->left)
@@ -167,102 +159,90 @@ namespace ft
 								 }
 							 }
 							 // case 3
-							 else if (P->color == 1 && (!S || (S->color == 1
-									 && (!Sl || Sl == _leaf || Sl->color == 1)
-									 && (!Sr || Sr == _leaf || Sr->color == 1))))
+							 else if (P->color == 1 && S->color == 1
+									 && SlColor == 1 && SrColor == 1)
 							 {
-								 if (S)
-									 S->color = 0;
+								 std::cout << "case 3" << std::endl;
+								 S->color = 0;
 								 if (P->parent)
 									 S = (P->parent->right == P) ? P->parent->left :
 										 P->parent->right;
 								 P = P->parent;
 							 }
 							 // case 4
-							 else if (P->color == 0 && (!S || (S->color == 1
-									 && (!Sl || Sl == _leaf || Sl->color == 1)
-									 && (!Sr || Sr == _leaf || Sr->color == 1))))
+							 else if (P->color == 0 && S->color == 1
+									 && SlColor == 1 && SrColor == 1)
 							 {
+								 std::cout << "case 4 ×" << std::endl;
 								 P->color = 1;
-								 if (S)
-									 S->color = 0;
+								 S->color = 0;
 								 break;
 							 }
 							 // case 5
-							 else if (P->color == 1 && S->color == 2
-									 && (((!Sl || Sl == _leaf || Sl->color == 1)
-											 && (Sr && Sr->color == 0))
-										 || ((!Sr || Sr == _leaf || Sr->color == 1)
-											 && (Sl && Sl->color == 0))
-										 || (Sr->color + Sl->color == 1)))
+							 else if (/*P->color == 1 && */S->color == 1
+									 && ((S == P->right && SlColor == 0)
+										 || (S == P->left && SrColor == 0)))
 							 {
+								 std::cout << "case 5" << std::endl;
 								 S->color = 0;
 								 if (Sr->color == 0)
 								 {
 									 Sr->color = 1;
-									 rightRotate(S);
-									 S = Sr;
+									 leftRotate(S);
 								 }
 								 else
 								 {
 									 Sl->color = 1;
-									 leftRotate(S);
-									 S = Sl;
+									 rightRotate(S);
 								 }
+								 S = S->parent;
 							 }
 							 // case 6
 							 else
 							 {
+								 std::cout << "case 6 ×" << std::endl;
 								 if (S == P->left)
 								 {
 									 Sl->color = 1;
-									 leftRotate(P);
+									 rightRotate(P);
 								 }
 								 else
 								 {
 									 Sr->color = 1;
-									 rightRotate(P);
+									 leftRotate(P);
 								 }
 								 break;
 							 }
 						 }
 					 }
 
-					 void deleteNode(Node* N)
+					 void deleteNode(Node *N)
 					 {
-						 std::size_t nCol;
+						 size_type nCol;
 						 Node* P;
 						 Node* S;
 
 						 if (!N)
 							 return ;
-						 _size--;
 						 // Reorder if N has two childs
-						 if (N->right && N->left
-								 && N->right != _leaf && N->left != _leaf)
+						 if (N->right && N->left)
 						 {
 							 swapVal(N, getMinimum(N->right));
 							 N = getMinimum(N->right);
 						 }
 						 nCol = N->color;
-						 if (N->parent)
-						 {
-							 P = N->parent;
-							 S = (P->left == N) ? P->right : P->left;
-						 }
-						 else
-						 {
-							 P = NULL;
-							 S = NULL;
-						 }
-						 if (N->right && N->right != _leaf)
+						 P = N->parent;
+						 S = (P->left == N) ? P->right : P->left;
+						 if (N->right)
 						 {
 							 swapVal(N, N->right);
+							 nCol = N->right->color;
 							 N->right = NULL;
 						 }
-						 else if (N->left && N->left != _leaf)
+						 else if (N->left)
 						 {
 							 swapVal(N, N->left);
+							 nCol = N->left->color;
 							 N->left = NULL;
 						 }
 						 else
@@ -280,8 +260,11 @@ namespace ft
 									 N->parent->left = NULL;
 							 }
 						 }
-						 if (nCol == 0 && _root)
+						 _size--;
+						 if (nCol == 1 && _root)
 							 RBT_delete(P, S);
+						 while (_root && _root->parent)
+							 _root = _root->parent;
 						 Node *min = getMinimum(_root);
 						 Node *max = getMaximum(_root);
 						 min->left = _leaf;
@@ -651,7 +634,7 @@ namespace ft
 					 void erase (iterator first, iterator last)
 					 {
 						 for (iterator it = first; it != last; it++)
-							 erase(it);
+							 deleteNode(searchTree(_root, it->first));
 					 }
 
 					 void swap (map& x)

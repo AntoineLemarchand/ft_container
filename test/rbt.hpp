@@ -80,42 +80,50 @@ namespace ft
 					}
 				}
 
-				void	leftRotate(node_type* l)
+				void	leftRotate(node_type* P)
 				{
-					node_type*	r;
+					node_type* N = P->right;
+					node_type* tmp;
 
-					r = l->right;
-					if (l->parent && l->parent->right == l)
-						l->parent->right = r;
-					else if (l->parent)
-						l->parent->left = r;
+					if (N->left)
+						N->left->parent = P;
+					// rotating parents
+					N->parent = P->parent;
+					if (!P->parent)
+						_root = N;
+					else if (P->parent->right == P)
+						P->parent->right = N;
 					else
-						_root = r;
-					r->parent = l->parent;
-					l->right = r->left;
-					if (l->right)
-						l->right->parent = l;
-					r->left = l;
-					l->parent = r;
+						P->parent->left = N;
+					P->parent = N;
+
+					// and childs
+					tmp = N->left;
+					N->left = P;
+					P->right = tmp;
 				}
 
-				void	rightRotate(node_type* r)
+				void	rightRotate(node_type* P)
 				{
-					node_type*	l;
+					node_type* N = P->left;
+					node_type* tmp;
 
-					l = r->left;
-					if (r->parent && r->parent->right == r)
-						r->parent->right = l;
-					else if (r->parent)
-						r->parent->left = l;
+					if (N->right)
+						N->right->parent = P;
+					// rotating parents
+					N->parent = P->parent;
+					if (!P->parent)
+						_root = N;
+					else if (P->parent->right == P)
+						P->parent->right = N;
 					else
-						_root = l;
-					l->parent = r->parent;
-					r->left = l->right;
-					if (r->left)
-						r->left->parent = r;
-					l->right = r;
-					r->parent = l;
+						P->parent->left = N;
+					P->parent = N;
+
+					// and childs
+					tmp = N->right;
+					N->right = P;
+					P->left = tmp;
 				}
 
 				void	initNode(node_type** node, node_type* parent,
@@ -260,14 +268,17 @@ namespace ft
 					{
 						node_type* Sl = S->left;
 						node_type* Sr = S->right;
+						std::size_t SlColor = (!Sl || Sl->color == 1);
+						std::size_t SrColor = (!Sr || Sr->color == 1);
+
 						// case 2
 						if (P->color == 1 && S->color == 0
-								&& (!Sl || Sl->color == 1)
-								&& (!Sr || Sr->color == 1))
+								&& SlColor == 1	&& Sr->color == 1)
 						{
+							std::cout << "case 2" << std::endl;
 							P->color = 0;
 							S->color = 1;
-							if (S == P->left)
+							if (S == P->right)
 							{
 								S = S->left;
 								leftRotate(P);
@@ -280,9 +291,9 @@ namespace ft
 						}
 						// case 3
 						else if (P->color == 1 && S->color == 1
-								&& (!Sl || Sl->color == 1)
-								&& (!Sr || Sr->color == 1))
+								&& SlColor == 1 && SrColor == 1)
 						{
+							std::cout << "case 3" << std::endl;
 							S->color = 0;
 							if (P->parent)
 								S = (P->parent->right == P) ? P->parent->left :
@@ -291,51 +302,48 @@ namespace ft
 						}
 						// case 4
 						else if (P->color == 0 && S->color == 1
-								&& (!Sl || Sl->color == 1)
-								&& (!Sr || Sr->color == 1))
+								&& SlColor == 1 && SrColor == 1)
 						{
+							std::cout << "case 4 ×" << std::endl;
 							P->color = 1;
 							S->color = 0;
 							break;
 						}
 						// case 5
-						else if (P->color == 1 && S->color == 2
-								&& (((!Sl || Sl->color == 1)
-										&& (Sr && Sr->color == 0))
-									|| ((!Sr || Sr->color == 1)
-										&& (Sl && Sl->color == 0))
-									|| (Sr->color + Sl->color == 1)))
+						else if (/*P->color == 1 && */S->color == 1
+								&& ((S == P->right && SlColor == 0)
+									|| (S == P->left && SrColor == 0)))
 						{
+							std::cout << "case 5" << std::endl;
 							S->color = 0;
-							if (Sr->color = 0)
+							if (Sr->color == 0)
 							{
 								Sr->color = 1;
-								rightRotate(S);
-								S = Sr;
-							}
-							else
-							{
-								Sl->color = 1;
 								leftRotate(S);
-								S = Sl;
-							}
-						}
-						// case 6
-						else;
-						{
-							if (S == P->left)
-							{
-								Sl->color = 1;
-								leftRotate(P);
 							}
 							else
 							{
-								Sr->color = 1;
-								rightRotate(P);
+								Sl->color = 1;
+								rightRotate(S);
 							}
-							break;
 						}
-					}
+						 // case 6
+						 else
+						 {
+							 std::cout << "case 6 ×" << std::endl;
+							 if (S == P->left)
+							 {
+								 Sl->color = 1;
+								 rightRotate(P);
+							 }
+							 else
+							 {
+								 Sr->color = 1;
+								 leftRotate(P);
+							 }
+							 break;
+						 }
+					 }
 				}
 
 				void deleteNode(Key key)
@@ -356,15 +364,18 @@ namespace ft
 					}
 					nCol = N->color;
 					P = N->parent;
-					S = (P->left == N) ? P->right : P->left;
+					if (P)
+						S = (P->left == N) ? P->right : P->left;
 					if (N->right)
 					{
 						swapVal(N, N->right);
+						nCol = N->right->color;
 						N->right = NULL;
 					}
 					else if (N->left)
 					{
 						swapVal(N, N->left);
+						nCol = N->left->color;
 						N->left = NULL;
 					}
 					else
@@ -382,7 +393,7 @@ namespace ft
 								N->parent->left = NULL;
 						}
 					}
-					if (nCol == 0 && _root)
+					if (nCol == 1 && _root)
 						RBT_delete(P, S);
 				}
 
