@@ -134,36 +134,154 @@ namespace ft
 						 clearNode(n);
 					 }
 
-					 // https://www.usna.edu/Users/cs/crabbe/SI321/current/red-black/red-black.html
+					 // thanks god
+					 // https://www.youtube.com/watch?v=CTvfzU_uNKE
+					 void RBT_delete(Node* P, Node* S)
+					 {
+						Node*	Sl;
+						Node*	Sr;				
+						// case 1
+						 while (P)
+						 {
+							 if (S)
+							 {
+								 Sl = S->left;
+								 Sr = S->right;
+							 }
+							 // case 2
+							 if (P->color == 1 && S && S->color == 0
+									 && (!Sl || Sl == _leaf || Sl->color == 1)
+									 && (!Sr || Sr == _leaf || Sr->color == 1))
+							 {
+								 P->color = 0;
+								 S->color = 1;
+								 if (S == P->left)
+								 {
+									 S = S->left;
+									 leftRotate(P);
+								 }
+								 else
+								 {
+									 S = S->right;
+									 rightRotate(P);
+								 }
+							 }
+							 // case 3
+							 else if (P->color == 1 && (!S || (S->color == 1
+									 && (!Sl || Sl == _leaf || Sl->color == 1)
+									 && (!Sr || Sr == _leaf || Sr->color == 1))))
+							 {
+								 if (S)
+									 S->color = 0;
+								 if (P->parent)
+									 S = (P->parent->right == P) ? P->parent->left :
+										 P->parent->right;
+								 P = P->parent;
+							 }
+							 // case 4
+							 else if (P->color == 0 && (!S || (S->color == 1
+									 && (!Sl || Sl == _leaf || Sl->color == 1)
+									 && (!Sr || Sr == _leaf || Sr->color == 1))))
+							 {
+								 P->color = 1;
+								 if (S)
+									 S->color = 0;
+								 break;
+							 }
+							 // case 5
+							 else if (P->color == 1 && S->color == 2
+									 && (((!Sl || Sl == _leaf || Sl->color == 1)
+											 && (Sr && Sr->color == 0))
+										 || ((!Sr || Sr == _leaf || Sr->color == 1)
+											 && (Sl && Sl->color == 0))
+										 || (Sr->color + Sl->color == 1)))
+							 {
+								 S->color = 0;
+								 if (Sr->color == 0)
+								 {
+									 Sr->color = 1;
+									 rightRotate(S);
+									 S = Sr;
+								 }
+								 else
+								 {
+									 Sl->color = 1;
+									 leftRotate(S);
+									 S = Sl;
+								 }
+							 }
+							 // case 6
+							 else
+							 {
+								 if (S == P->left)
+								 {
+									 Sl->color = 1;
+									 leftRotate(P);
+								 }
+								 else
+								 {
+									 Sr->color = 1;
+									 rightRotate(P);
+								 }
+								 break;
+							 }
+						 }
+					 }
+
 					 void deleteNode(Node* N)
 					 {
+						 std::size_t nCol;
+						 Node* P;
+						 Node* S;
+
 						 if (!N)
-							 return;
-						 if (N->right)
+							 return ;
+						 _size--;
+						 // Reorder if N has two childs
+						 if (N->right && N->left
+								 && N->right != _leaf && N->left != _leaf)
 						 {
 							 swapVal(N, getMinimum(N->right));
 							 N = getMinimum(N->right);
-							 if (N->right)
-								 moveUp(N, N->right);
 						 }
-						 else if (N->left)
+						 nCol = N->color;
+						 if (N->parent)
 						 {
-							 swapVal(N, getMaximum(N->left));
-							 N = getMaximum(N->left);
-							 if (N->left)
-								 moveUp(N, N->left);
+							 P = N->parent;
+							 S = (P->left == N) ? P->right : P->left;
 						 }
-						 if (!N->parent)
-						 {
-							 _root = NULL;
-							 return;
-						 }
-						 if (N->parent->right == N)
-							 N->parent->right = NULL;
 						 else
-							 N->parent->left = NULL;
-						 while (_root && _root->parent)
-							 _root = _root->parent;
+						 {
+							 P = NULL;
+							 S = NULL;
+						 }
+						 if (N->right && N->right != _leaf)
+						 {
+							 swapVal(N, N->right);
+							 N->right = NULL;
+						 }
+						 else if (N->left && N->left != _leaf)
+						 {
+							 swapVal(N, N->left);
+							 N->left = NULL;
+						 }
+						 else
+						 {
+							 if (N == _root)
+							 {
+								 _root = NULL;
+								 return;
+							 }
+							 else
+							 {
+								 if (N->parent->right == N)
+									 N->parent->right = NULL;
+								 else
+									 N->parent->left = NULL;
+							 }
+						 }
+						 if (nCol == 0 && _root)
+							 RBT_delete(P, S);
 						 Node *min = getMinimum(_root);
 						 Node *max = getMaximum(_root);
 						 min->left = _leaf;
@@ -540,7 +658,7 @@ namespace ft
 					 {
 
 						 typename Alloc::template rebind<Node >::other
-									nodeAlloc_tmp = _nodeAlloc;
+							 nodeAlloc_tmp = _nodeAlloc;
 						 Alloc		alloc_tmp = _alloc;
 						 Compare	comp_tmp = _comp;
 						 size_type	size_tmp = _size;

@@ -55,6 +55,7 @@ int main ( void )
 	for (std::list<std::pair<int, std::string> >::iterator it = lst.begin(); it !=lst.end(); it++)
 		tr.insertNode(*it);
 	print2D(tr.getRoot());
+	tr.deleteNode(4);
 	print2D(tr.getRoot());
 	/*
 	for (std::string line; std::getline(std::cin, line);) {

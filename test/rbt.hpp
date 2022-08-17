@@ -233,7 +233,7 @@ namespace ft
 					return (N);
 				}
 
-				void swapval(node* n1, node* n2)
+				void swapVal(node_type* n1, node_type* n2)
 				{
 					value_type tmp = n1->val;
 
@@ -252,43 +252,138 @@ namespace ft
 						n->parent->left = nchild;
 
 				}
-				// segfaulting for now
-				// https://www.usna.edu/Users/cs/crabbe/SI321/current/red-black/red-black.html
+
+				void RBT_delete(node_type* P, node_type* S)
+				{
+					// case 1
+					while (P)
+					{
+						node_type* Sl = S->left;
+						node_type* Sr = S->right;
+						// case 2
+						if (P->color == 1 && S->color == 0
+								&& (!Sl || Sl->color == 1)
+								&& (!Sr || Sr->color == 1))
+						{
+							P->color = 0;
+							S->color = 1;
+							if (S == P->left)
+							{
+								S = S->left;
+								leftRotate(P);
+							}
+							else
+							{
+								S = S->right;
+								rightRotate(P);
+							}
+						}
+						// case 3
+						else if (P->color == 1 && S->color == 1
+								&& (!Sl || Sl->color == 1)
+								&& (!Sr || Sr->color == 1))
+						{
+							S->color = 0;
+							if (P->parent)
+								S = (P->parent->right == P) ? P->parent->left :
+									P->parent->right;
+							P = P->parent;
+						}
+						// case 4
+						else if (P->color == 0 && S->color == 1
+								&& (!Sl || Sl->color == 1)
+								&& (!Sr || Sr->color == 1))
+						{
+							P->color = 1;
+							S->color = 0;
+							break;
+						}
+						// case 5
+						else if (P->color == 1 && S->color == 2
+								&& (((!Sl || Sl->color == 1)
+										&& (Sr && Sr->color == 0))
+									|| ((!Sr || Sr->color == 1)
+										&& (Sl && Sl->color == 0))
+									|| (Sr->color + Sl->color == 1)))
+						{
+							S->color = 0;
+							if (Sr->color = 0)
+							{
+								Sr->color = 1;
+								rightRotate(S);
+								S = Sr;
+							}
+							else
+							{
+								Sl->color = 1;
+								leftRotate(S);
+								S = Sl;
+							}
+						}
+						// case 6
+						else;
+						{
+							if (S == P->left)
+							{
+								Sl->color = 1;
+								leftRotate(P);
+							}
+							else
+							{
+								Sr->color = 1;
+								rightRotate(P);
+							}
+							break;
+						}
+					}
+				}
+
 				void deleteNode(Key key)
 				{
-					std::cout << "deleting " << key << std::endl;
-					std::size_t originalColor;
+					std::size_t nCol;
 					node_type* N = searchTree(_root, key);
-					/*
-					 * if n has childs, either swap the val with successor or
-					 * predecessor
-					 */
+					node_type* child;
+					node_type* P;
+					node_type* S;
+
 					if (!N)
-						return;
-					if (N->right)
+						return ;
+					// Reorder if N has two childs
+					if (N->right && N->left)
 					{
 						swapVal(N, getMinimum(N->right));
 						N = getMinimum(N->right);
-						if (N->right)
-							moveUp(N, N->right);
+					}
+					nCol = N->color;
+					P = N->parent;
+					S = (P->left == N) ? P->right : P->left;
+					if (N->right)
+					{
+						swapVal(N, N->right);
+						N->right = NULL;
 					}
 					else if (N->left)
 					{
-						swapVal(N, getMaximum(N->left));
-						N = getMaximum(N->left);
-						if (N->left)
-							moveUp(N, N->left);
+						swapVal(N, N->left);
+						N->left = NULL;
 					}
-					if (!N->parent)
-					{
-						_root = NULL;
-						return;
-					}
-					if (N->parent->right == N)
-						N->parent->right = NULL;
 					else
-						N->parent->left = NULL;
-					originalColor = N->color;
+					{
+						if (N == _root)
+						{
+							_root = NULL;
+							return;
+						}
+						else
+						{
+							if (N->parent->right == N)
+								N->parent->right = NULL;
+							else
+								N->parent->left = NULL;
+						}
+					}
+					if (nCol == 0 && _root)
+						RBT_delete(P, S);
 				}
 
 				node_type* getRoot( void )
