@@ -23,9 +23,9 @@ namespace ft
 						 _size--;
 						 if (node && node != _leaf)
 						 {
-							 if (node->left)
+							 if (node->left && node->left != _leaf)
 								 clearNode(node->left);
-							 if (node->right)
+							 if (node->right && node->right != _leaf)
 								 clearNode(node->right);
 							 _alloc.destroy(static_cast<pair<const Key, T>* >
 									 (node->val));
@@ -122,9 +122,46 @@ namespace ft
 					 // NODE DELETION
 					 void swapVal(Node* n1, Node* n2)
 					 {
-						 void* tmp = n1->val;
-						 n1->val = n2->val;
-						 n2->val = tmp;
+						 Node* tmp;
+						 Node* tmp2;
+						 std::size_t ctmp;
+
+						 // switching parents
+						 tmp = n1->parent;
+						 tmp2 = n2->parent;
+						 n2->parent = tmp;
+						 n1->parent = tmp2;
+						 if (!tmp)
+							 _root = n2;
+						 else if (tmp->right == n1)
+							 tmp->right = n2;
+						 else
+							 tmp->left = n2;
+						 if (!tmp2)
+							 _root = n1;
+						 else if (tmp2->right == n2)
+							 tmp2->right = n1;
+						 else
+							 tmp2->left = n1;
+						 // and childs
+						 tmp = n1->left;
+						 tmp2 = n1->right;
+						 n1->left = n2->left;
+						 n1->right = n2->right;
+						 n2->left = tmp;
+						 n2->right = tmp2;
+						 if (n1->left && n1->left != _leaf)
+							 n1->left->parent = n1;
+						 if (n1->right && n1->right != _leaf)
+							 n1->right->parent = n1;
+						 if (n2->left && n2->left != _leaf)
+							 n2->left->parent = n2;
+						 if (n2->right && n2->right != _leaf)
+							 n2->right->parent = n2;
+						 // swap color
+						 ctmp = n1->color;
+						 n1->color = n2->color;
+						 n2->color = ctmp;
 					 }
 
 					 // thanks god
@@ -139,14 +176,14 @@ namespace ft
 						 // case 1
 						 while (P)
 						 {
-							 if (S)
+							 if (S && S != _leaf)
 							 {
 								 Sl = S->left;
 								 Sr = S->right;
 							 }
-							 SlColor = (!S || !Sl
+							 SlColor = (!S || S == _leaf || !Sl
 									 || Sl == _leaf || Sl->color == 1);
-							 SrColor = (!S || !Sr ||
+							 SrColor = (!S || S == _leaf || !Sr ||
 									 Sr == _leaf || Sr->color == 1);
 
 							 // case 2
@@ -167,7 +204,7 @@ namespace ft
 								 }
 							 }
 							 // case 3
-							 else if (P->color == 1 && (!S || S->color == 1)
+							 else if (P->color == 1 && (!S || S->color != 0)
 									 && SlColor == 1 && SrColor == 1)
 							 {
 								 if (S)
@@ -178,7 +215,7 @@ namespace ft
 								 P = P->parent;
 							 }
 							 // case 4
-							 else if (P->color == 0 && (!S || S->color == 1)
+							 else if (P->color == 0 && (!S || S->color != 0)
 									 && SlColor == 1 && SrColor == 1)
 							 {
 								 P->color = 1;
@@ -187,11 +224,11 @@ namespace ft
 								 break;
 							 }
 							 // case 5
-							 else if ((!S || S->color == 1)
-									 && ((S == P->right && SlColor == 0)
-										 || (S == P->left && SrColor == 0)))
+							 else if ((!S || S->color != 0)
+									 && ((S == P->right && SlColor == 0 && SrColor != 0)
+										 || (S == P->left && SrColor == 0 && SlColor != 0)))
 							 {
-								 if (S)
+								 if (S && S != _leaf)
 									 S->color = 0;
 								 if (Sr->color == 0)
 								 {
@@ -203,7 +240,7 @@ namespace ft
 									 Sl->color = 1;
 									 rightRotate(S);
 								 }
-								 if (S)
+								 if (S && S != _leaf)
 									 S = S->parent;
 							 }
 							 // case 6
@@ -226,52 +263,44 @@ namespace ft
 
 					 void deleteNode(Node *N)
 					 {
-						 size_type nCol;
 						 Node* P;
 						 Node* S;
 
-						 if (N)
+						 _size--;
+						 if (N->right && N->left
+								 && N->right != _leaf && N->left != _leaf)
+							 swapVal(N, getMinimum(N->right));
+						 P = N->parent;
+						 if (P)
+							 S = (P->left == N) ? P->right : P->left;
+						 if (N->right && N->right != _leaf)
 						 {
-							 if (N->right && N->left)
+							 swapVal(N, N->right);
+							 N->parent->right = NULL;
+						 }
+						 else if (N->left && N->left != _leaf)
+						 {
+							 swapVal(N, N->left);
+							 N->parent->left = NULL;
+						 }
+						 else
+						 {
+							 if (N == _root)
 							 {
-								 swapVal(N, getMinimum(N->right));
-								 N = getMinimum(N->right);
-							 }
-							 P = N->parent;
-							 if (P)
-								 S = (P->left == N) ? P->right : P->left;
-							 if (N->right && N->right != _leaf)
-							 {
-								 nCol = N->right->color;
-								 swapVal(N, N->right);
-								 N->right = NULL;
-							 }
-							 else if (N->left && N->left != _leaf)
-							 {
-								 nCol = N->left->color;
-								 swapVal(N, N->left);
-								 N->left = NULL;
+								 _root = NULL;
+								 _leaf->right = NULL;
+								 _leaf->left = NULL;
 							 }
 							 else
 							 {
-								 nCol = N->color;
-								 if (N == _root)
-								 {
-									 _root = NULL;
-									 return;
-								 }
+								 if (N->parent->right == N)
+									 N->parent->right = NULL;
 								 else
-								 {
-									 if (N->parent->right == N)
-										 N->parent->right = NULL;
-									 else
-										 N->parent->left = NULL;
-								 }
+									 N->parent->left = NULL;
 							 }
-							 _size--;
-							 if (nCol == 1 && _root)
-								 RBT_delete(P, S);
 						 }
+						 if (N->color == 1 && _root)
+							 RBT_delete(P, S);
 						 if (_root)
 						 {
 							 while (_root->parent)
@@ -283,6 +312,10 @@ namespace ft
 							 _leaf->right = min;
 							 _leaf->left = max;
 						 }
+						 _alloc.destroy(static_cast<value_type*>(N->val));
+						 _alloc.deallocate(static_cast<value_type*>(N->val), 1);
+						 _nodeAlloc.destroy(N);
+						 _nodeAlloc.deallocate(N, 1);
 					 }
 
 					 // NODE INSERTION
@@ -624,7 +657,7 @@ namespace ft
 					 template <class InputIterator>
 						 void insert (InputIterator first, InputIterator last)
 						 {
-							 for (InputIterator it = first; it != last; it++)
+							 for (InputIterator it = first; it != last; ++it)
 								 insert(*it);
 						 }
 
@@ -645,14 +678,12 @@ namespace ft
 
 					 void erase (iterator first, iterator last)
 					 {
-						 for (iterator it = first; it != last; it++)
+						 iterator prev = first++;
+
+						 while (prev != last)
 						 {
-							 if (it.getCurrent() == _leaf)
-								 std::cout << "leaf";
-							 else
-								 std::cout << it->first;
-							 std::cout << " max " << iterator(*getMaximum(_root))->first << std::endl;
-							 deleteNode(searchTree(_root, it->first));
+							 deleteNode(searchTree(_root, prev->first));
+							 prev = first++;
 						 }
 					 }
 

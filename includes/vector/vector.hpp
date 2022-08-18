@@ -15,13 +15,13 @@ namespace	ft
 					value_type;
 				typedef	Alloc
 					allocator_type;
-				typedef	T&
+				typedef	value_type&
 					reference;
-				typedef	const T&
+				typedef	const value_type&
 					const_reference;
-				typedef	T*
+				typedef	value_type*
 					pointer;
-				typedef	const T*
+				typedef	const value_type*
 					const_pointer;
 				typedef	vectorIterator<value_type>
 					iterator;

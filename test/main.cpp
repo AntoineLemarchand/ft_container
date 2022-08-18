@@ -63,9 +63,8 @@ int main ( void )
 	tr.deleteNode(3);
 	tr.deleteNode(4);
 
-	print2D(tr.getRoot());
+	tr.deleteNode(6);
 	tr.deleteNode(7);
-	print2D(tr.getRoot());
 	tr.deleteNode(8);
 
 	tr.insertNode(std::make_pair(10, "Hello"));
@@ -73,16 +72,23 @@ int main ( void )
 	tr.deleteNode(9);
 	tr.deleteNode(10);
 	tr.deleteNode(11);
+
 	tr.insertNode(std::make_pair(12, "ONE"));
 	tr.insertNode(std::make_pair(13, "TWO"));
 	tr.insertNode(std::make_pair(14, "THREE"));
 	tr.insertNode(std::make_pair(15, "FOUR"));
+
+	print2D(tr.getRoot());
 	tr.deleteNode(5);
-	tr.deleteNode(6);
+	print2D(tr.getRoot());
 	tr.deleteNode(12);
+	print2D(tr.getRoot());
 	tr.deleteNode(13);
+	print2D(tr.getRoot());
 	tr.deleteNode(14);
+	print2D(tr.getRoot());
 	tr.deleteNode(15);
+	print2D(tr.getRoot());
 
 	/*
 	for (std::string line; std::getline(std::cin, line);) {

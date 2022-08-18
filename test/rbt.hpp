@@ -241,25 +241,45 @@ namespace ft
 					return (N);
 				}
 
-				void swapVal(node_type* n1, node_type* n2)
-				{
-					value_type tmp = n1->val;
+				 void swapVal(node_type* n1, node_type* n2)
+				 {
+					 node_type* tmp;
+					 node_type* tmp2;
+					 std::size_t ctmp;
 
-					n1->val = n2->val;
-					n2->val = tmp;
-				}
-
-				void moveUp(node_type* n, node_type* nchild)
-				{
-					nchild->color = 1;
-					if (!n->parent)
-						_root = nchild;
-					else if (n->parent->right == n)
-						n->parent->right = nchild;
-					else
-						n->parent->left = nchild;
-
-				}
+					 // switching parents
+					 tmp = n1->parent;
+					 tmp2 = n2->parent;
+					 n2->parent = tmp;
+					 n1->parent = tmp2;
+					 if (!tmp)
+						 _root = n2;
+					 else if (tmp->right == n1)
+						tmp->right = n2;
+					 else
+						tmp->left = n2;
+					 if (!tmp2)
+						 _root = n1;
+					 else if (tmp2->right == n2)
+						tmp2->right = n1;
+					 else
+						tmp2->left = n1;
+					 // and childs
+					 tmp = n1->left;
+					 tmp2 = n1->right;
+					 n1->left = n2->left;
+					 n1->right = n2->right;
+					 n2->left = tmp;
+					 n2->right = tmp2;
+					 if (n1->left)
+						 n1->left->parent = n1;
+					 if (n1->right)
+						 n1->right->parent = n1;
+					 if (n2->left)
+						 n2->left->parent = n2;
+					 if (n2->right)
+						 n2->right->parent = n2;
+				 }
 
 				void RBT_delete(node_type* P, node_type* S)
 				{
@@ -317,12 +337,11 @@ namespace ft
 						}
 						// case 5
 						else if ((!S || S->color == 1)
-								&& ((S == P->right && SlColor == 0)
-									|| (S == P->left && SrColor == 0)))
+								&& ((S == P->right && SlColor == 0 && SrColor != 0)
+									|| (S == P->left && SrColor == 0 && SlColor != 0)))
 						{
 							std::cout << "case 5" << std::endl;
-							if (S)
-								S->color = 0;
+							S->color = 0;
 							if (Sr->color == 0)
 							{
 								Sr->color = 1;
@@ -340,12 +359,14 @@ namespace ft
 							 std::cout << "case 6 ×" << std::endl;
 							 if (S == P->left)
 							 {
-								 Sl->color = 1;
+								 if (Sl)
+									 Sl->color = 1;
 								 rightRotate(P);
 							 }
 							 else
 							 {
-								 Sr->color = 1;
+								 if (Sr)
+									 Sr->color = 1;
 								 leftRotate(P);
 							 }
 							 break;
@@ -364,10 +385,7 @@ namespace ft
 						return ;
 					// Reorder if N has two childs
 					if (N->right && N->left)
-					{
 						swapVal(N, getMinimum(N->right));
-						N = getMinimum(N->right);
-					}
 					nCol = N->color;
 					P = N->parent;
 					if (P)
@@ -375,14 +393,12 @@ namespace ft
 					if (N->right)
 					{
 						swapVal(N, N->right);
-						nCol = N->right->color;
-						N->right = NULL;
+						N->parent->right = NULL;
 					}
 					else if (N->left)
 					{
 						swapVal(N, N->left);
-						nCol = N->left->color;
-						N->left = NULL;
+						N->parent->left = NULL;
 					}
 					else
 					{
