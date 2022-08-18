@@ -800,12 +800,12 @@ namespace ft
 					 pair<const_iterator,const_iterator> equal_range
 						 (const key_type& k) const
 						 {
-							 return(make_pair(lower_bound(k), upper_bound(k)));
+							 return(ft::make_pair(lower_bound(k), upper_bound(k)));
 						 }
 
 					 pair<iterator,iterator>	equal_range (const key_type& k)
 					 {
-						 return(make_pair(lower_bound(k), upper_bound(k)));
+						 return(ft::make_pair(lower_bound(k), upper_bound(k)));
 					 }
 
 					 // ALLOCATOR
