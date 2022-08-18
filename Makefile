@@ -6,13 +6,13 @@
 #    By: alemarch <alemarch@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/16 14:33:53 by alemarch          #+#    #+#              #
-#    Updated: 2022/08/18 11:47:49 by alemarch         ###   ########.fr        #
+#    Updated: 2022/08/18 18:09:19 by alemarch         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 NAME				= 	compare_containers
 
 SRCDIR				= 	srcs/
-SRCFILES			=	unitTest main
+SRCFILES			=	main
 SRCTYPE				=	.cpp
 
 INCDIR				= includes includes/vector includes/stack includes/map

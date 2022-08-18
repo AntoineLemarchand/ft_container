@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#if 0 //CREATE A REAL STL EXAMPLE
+#if 1 //CREATE A REAL STL EXAMPLE
 	#include <map>
 	#include <stack>
 	#include <vector>
@@ -11,8 +11,6 @@
 	#include "stack.hpp"
 	#include "vector.hpp"
 #endif
-
-#include "unitTest.hpp"
 
 // VECTORS
 void	vec_iterator( void )
@@ -112,30 +110,30 @@ void	vec_elementAccess( void )
 void	vec_modifier( void )
 {
 	std::cout << "░▒▓ vector modifier" << std::endl;
-	ft::vector<double> test;
+	ft::vector<int> test;
 	for (int i = 0; i < 15; i++)
 		test.push_back(i * 5);
 	std::cout << "░▒assigning 5 from begin() to begin() + 5" << std::endl;
 	std::cout << "░▒before" << std::endl;
-	for (ft::vector<double>::iterator it = test.begin(); it != test.end(); it++)
+	for (ft::vector<int>::iterator it = test.begin(); it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
 	std::cout << "░▒after" << std::endl;
 	test.assign(test.begin(), test.begin() + 4);
 	std::cout << "░▒assigning 42 to the 10 element after begin() + 2" << std::endl;
 	std::cout << "░▒before" << std::endl;
-	for (ft::vector<double>::iterator it = test.begin(); it != test.end(); it++)
+	for (ft::vector<int>::iterator it = test.begin(); it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
 	std::cout << "░▒after" << std::endl;
 	test.assign(10, 42);
-	for (ft::vector<double>::iterator it = test.begin(); it != test.end(); it++)
+	for (ft::vector<int>::iterator it = test.begin(); it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
-	std::cout << "░▒pushing back 42 then 21 followed by 10.5" << std::endl;
+	std::cout << "░▒pushing back 42 then 21 followed by 10" << std::endl;
 	std::cout << "░back" << test.back() << std::endl;
 	test.push_back(42);
 	std::cout << "░back" << test.back() << std::endl;
 	test.push_back(21);
 	std::cout << "░back" << test.back() << std::endl;
-	test.push_back(10.5);
+	test.push_back(10);
 	std::cout << "░back" << test.back() << std::endl;
 	std::cout << "░▒popping them out" << std::endl;
 	std::cout << "░back" << test.back() << std::endl;
@@ -148,36 +146,28 @@ void	vec_modifier( void )
 	std::cout << "░▒inserting 6 right after begin" << std::endl;
 	std::cout << "░test[1]" << test[1] << std::endl;
 	test.insert(test.begin() + 1, 6);
-	std::cout << "░▒inserting 4 3 right before end end" << std::endl;
-	std::cout << "░▒last 3" << std::endl;
-	for (ft::vector<double>::iterator it = test.end() - 4; it != test.end(); it++)
-		std::cout << "░" << *it << std::endl;
-	test.insert(test.end() - 4, 4, 3);
-	for (ft::vector<double>::iterator it = test.end() - 4; it != test.end(); it++)
-		std::cout << "░" << *it << std::endl;
-	std::cout << "░▒last 3" << std::endl;
 	std::cout << "░▒inserting first three at end" << std::endl;
-	for (ft::vector<double>::iterator it = test.end() - 4; it != test.end(); it++)
+	for (ft::vector<int>::iterator it = test.end() - 4; it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
 	test.insert(test.end() - 1, test.begin(), test.begin() + 3);
-	for (ft::vector<double>::iterator it = test.end() - 4; it != test.end(); it++)
+	for (ft::vector<int>::iterator it = test.end() - 4; it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
 	std::cout << "░▒ swapping with other vector (copy from 5 first)" << std::endl;
 	std::cout << "░▒ before" << std::endl;
-	ft::vector<double> test2(test.begin(), test.begin() + 5);
-	for (ft::vector<double>::iterator it = test.begin(); it != test.end(); it++)
+	ft::vector<int> test2(test.begin(), test.begin() + 5);
+	for (ft::vector<int>::iterator it = test.begin(); it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
 	test.swap(test2);
 	std::cout << "░▒ after" << std::endl;
-	for (ft::vector<double>::iterator it = test.begin(); it != test.end(); it++)
+	for (ft::vector<int>::iterator it = test.begin(); it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
 	std::cout << "░▒ clearing vector" << std::endl;
 	std::cout << "░▒ before" << std::endl;
-	for (ft::vector<double>::iterator it = test.begin(); it != test.end(); it++)
+	for (ft::vector<int>::iterator it = test.begin(); it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
 	test.clear();
 	std::cout << "░▒ after" << std::endl;
-	for (ft::vector<double>::iterator it = test.begin(); it != test.end(); it++)
+	for (ft::vector<int>::iterator it = test.begin(); it != test.end(); it++)
 		std::cout << "░" << *it << std::endl;
 }
 
