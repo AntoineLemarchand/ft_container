@@ -1,64 +1,62 @@
 #pragma once
 
-#include "mapIterator.hpp"
+#include "setIterator.hpp"
 #include "../utils/pair.hpp"
 #include "../utils/lexicographical_compare.hpp"
 
 namespace ft
 {
-	template < class Key, class T, class Compare = std::less<Key>,
-			 class Alloc = std::allocator<pair<const Key,T> > > class map
+	template < class T, class Compare = std::less<T>,
+			 class Alloc = std::allocator<T> > class set
 			 {
 				 private:
-					 typename Alloc::template rebind<Node >::other	_nodeAlloc;
+					 typename Alloc::template rebind<setNode >::other	_nodeAlloc;
 					 Alloc			_alloc;
 					 Compare		_comp;
 					 std::size_t	_size;
-					 Node*			_root;
-					 Node*			_leaf;
+					 setNode*			_root;
+					 setNode*			_leaf;
 
 					 // TREE UTILS
-					 void	clearNode(Node* node)
+					 void	clearsetNode(setNode* node)
 					 {
 						 _size--;
 						 if (node && node != _leaf)
 						 {
 							 if (node->left && node->left != _leaf)
-								 clearNode(node->left);
+								 clearsetNode(node->left);
 							 if (node->right && node->right != _leaf)
-								 clearNode(node->right);
-							 _alloc.destroy(static_cast<pair<const Key, T>* >
-									 (node->val));
-							 _alloc.deallocate(static_cast<pair<const Key, T>* >
-									 (node->val), 1);
+								 clearsetNode(node->right);
+							 _alloc.destroy(static_cast<T*>(node->val));
+							 _alloc.deallocate(static_cast<T*>(node->val), 1);
 							 _nodeAlloc.destroy(node);
 							 _nodeAlloc.deallocate(node, 1);
 						 }
 					 }
 
-					 Node* getMinimum(Node* N) const
+					 setNode* getMinimum(setNode* N) const
 					 {
 						 while (N->left && N->left != _leaf)
 							 N = N->left;
 						 return (N);
 					 }
 
-					 Node* getMaximum(Node* N) const
+					 setNode* getMaximum(setNode* N) const
 					 {
 						 while (N->right && N->right != _leaf)
 							 N = N->right;
 						 return (N);
 					 }
 
-					 Node*	searchTree(Node* root, Key key) const
+					 setNode*	searchTree(setNode* root, T val) const
 					 {
 						 if (root == NULL || root == _leaf
-								 || static_cast<value_type*>
-								 (root->val)->first == key)
+								 || *static_cast<value_type*>
+								 (root->val) == val)
 							 return (root);
-						 if (_comp(static_cast<value_type*>(root->val)->first, key))
-							 return (searchTree(root->right, key));
-						 return (searchTree(root->left, key));
+						 if (_comp(*static_cast<value_type*>(root->val), val))
+							 return (searchTree(root->right, val));
+						 return (searchTree(root->left, val));
 					 }
 
 					 /* to go from           to     */
@@ -67,10 +65,10 @@ namespace ft
 					 /*  l1   r              l  r2  */
 					 /*      / \            / \   \ */
 					 /*     r1 r2          l1 r1  r2*/
-					 void	leftRotate(Node* P)
+					 void	leftRotate(setNode* P)
 					 {
-						 Node* N = P->right;
-						 Node* tmp;
+						 setNode* N = P->right;
+						 setNode* tmp;
 
 						 if (N->left && N->left != _leaf)
 							 N->left->parent = P;
@@ -96,10 +94,10 @@ namespace ft
 					 /*   l  r2             l1   r  */
 					 /*  / \                    / \ */
 					 /* l1 l2                  l2 r2*/
-					 void	rightRotate(Node* P)
+					 void	rightRotate(setNode* P)
 					 {
-						 Node* N = P->left;
-						 Node* tmp;
+						 setNode* N = P->left;
+						 setNode* tmp;
 
 						 if (N->right && N->right != _leaf)
 							 N->right->parent = P;
@@ -120,10 +118,10 @@ namespace ft
 					 }
 
 					 // NODE DELETION
-					 void swapVal(Node* n1, Node* n2)
+					 void swapVal(setNode* n1, setNode* n2)
 					 {
-						 Node* tmp;
-						 Node* tmp2;
+						 setNode* tmp;
+						 setNode* tmp2;
 						 std::size_t ctmp;
 
 						 // switching parents
@@ -166,10 +164,10 @@ namespace ft
 
 					 // thanks god
 					 // https://www.youtube.com/watch?v=CTvfzU_uNKE
-					 void RBT_delete(Node* P, Node* S)
+					 void RBT_delete(setNode* P, setNode* S)
 					 {
-						 Node*	Sl;
-						 Node*	Sr;
+						 setNode*	Sl;
+						 setNode*	Sr;
 						 bool	SlColor;
 						 bool	SrColor;
 
@@ -261,10 +259,10 @@ namespace ft
 						 }
 					 }
 
-					 void deleteNode(Node *N)
+					 void deletesetNode(setNode *N)
 					 {
-						 Node* P;
-						 Node* S;
+						 setNode* P;
+						 setNode* S;
 
 						 _size--;
 						 if (N->right && N->left
@@ -305,8 +303,8 @@ namespace ft
 						 {
 							 while (_root->parent)
 								 _root = _root->parent;
-							 Node *min = getMinimum(_root);
-							 Node *max = getMaximum(_root);
+							 setNode *min = getMinimum(_root);
+							 setNode *max = getMaximum(_root);
 							 min->left = _leaf;
 							 max->right = _leaf;
 							 _leaf->right = min;
@@ -320,13 +318,12 @@ namespace ft
 
 					 // NODE INSERTION
 					 // classic BST insert
-					 Node*	tree_insert(Node* root, Node* prev,
-							 pair<const Key, T> val)
+					 setNode*	tree_insert(setNode* root, setNode* prev, T val)
 					 {
 						 if (!root || root == _leaf)
 						 {
 							 root = _nodeAlloc.allocate(1);
-							 _nodeAlloc.construct(root, Node());
+							 _nodeAlloc.construct(root, setNode());
 							 root->val = _alloc.allocate(1);
 							 _alloc.construct(static_cast<value_type*>
 									 (root->val), val);
@@ -334,22 +331,22 @@ namespace ft
 							 if (!_root)
 								 _root = root;
 						 }
-						 else if (!_comp(val.first, static_cast<value_type*>
-									 (root->val)->first))
+						 else if (!_comp(val, *static_cast<value_type*>
+									 (root->val)))
 							 root->right = tree_insert(root->right, root, val);
-						 else if (_comp(val.first, static_cast<value_type*>
-									 (root->val)->first))
+						 else if (_comp(val, *static_cast<value_type*>
+									 (root->val)))
 							 root->left = tree_insert(root->left, root, val);
 						 return (root);
 					 }
 
 					 //source
 					 //https://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Insertion
-					 void	RBT_fixInsert(Node* N)
+					 void	RBT_fixInsert(setNode* N)
 					 {
-						 Node* P = N->parent; //parent
-						 Node* G; //grandparent
-						 Node* U; // uncle
+						 setNode* P = N->parent; //parent
+						 setNode* G; //grandparent
+						 setNode* U; // uncle
 
 						 while (P)
 						 {
@@ -392,16 +389,16 @@ namespace ft
 						 _root->color = 1;
 					 }
 
-					 void insertNode(const pair<const Key, T>& val)
+					 void insertsetNode(const T val)
 					 {
 						 _size++;
 						 tree_insert(_root, NULL, val);
 						 if (_size > 1)
-							 RBT_fixInsert(searchTree(_root, val.first));
+							 RBT_fixInsert(searchTree(_root, val));
 						 while (_root && _root->parent)
 							 _root = _root->parent;
-						 Node *min = getMinimum(_root);
-						 Node *max = getMaximum(_root);
+						 setNode *min = getMinimum(_root);
+						 setNode *max = getMaximum(_root);
 						 min->left = _leaf;
 						 max->right = _leaf;
 						 _leaf->right = min;
@@ -411,14 +408,14 @@ namespace ft
 				 public:
 					 // MEMBER TYPES
 					 //		BASIC
-					 typedef Key
+					 typedef T
 						 key_type;
 					 typedef T
-						 mapped_type;
-					 typedef pair<const key_type, mapped_type>
 						 value_type;
 					 typedef Compare
 						 key_compare;
+					 typedef Compare
+						 value_compare;
 					 typedef Alloc
 						 allocator_type;
 					 typedef typename allocator_type::reference
@@ -430,47 +427,21 @@ namespace ft
 					 typedef typename allocator_type::const_pointer
 						 const_pointer;
 					 //		ITERATORS
-					 typedef mapIterator<value_type>
+					 typedef setIterator<const value_type>
 						 iterator;
-					 typedef mapIterator<const value_type>
+					 typedef setIterator<const value_type>
 						 const_iterator;
-					 typedef reverse_mapIterator<value_type>
+					 typedef reverse_setIterator<const value_type>
 						 reverse_iterator;
-					 typedef reverse_mapIterator<const value_type>
+					 typedef reverse_setIterator<const value_type>
 						 const_reverse_iterator;
 					 typedef std::ptrdiff_t
 						 difference_type;
 					 typedef std::size_t
 						 size_type;
 
-					 class value_compare
-					 {
-						 friend class map;
-						 protected:
-						 Compare comp;
-						 value_compare (Compare c) : comp(c) {}
-						 public:
-						 value_compare() {}
-						 value_compare(const value_compare& vc) {(void)vc;}
-						 value_compare& operator = (const value_compare& vc)
-						 {
-							 (void)vc;
-							 return *this;
-						 }
-						 ~value_compare() {}
-						 typedef bool result_type;
-						 typedef value_type first_argument_type;
-						 typedef value_type second_argument_type;
-
-						 bool operator() (const value_type&x,
-								 const value_type& y) const
-						 {
-							 return comp(x.first, y.first);
-						 }
-					 };
-
 					 // CONSTRUCTORS
-					 explicit map (const key_compare& comp = key_compare(),
+					 explicit set (const key_compare& comp = key_compare(),
 							 const allocator_type& alloc = allocator_type())
 					 {
 						 _alloc = alloc;
@@ -478,12 +449,12 @@ namespace ft
 						 _size = 0;
 						 _root = NULL;
 						 _leaf = _nodeAlloc.allocate(1);
-						 _nodeAlloc.construct(_leaf, Node());
+						 _nodeAlloc.construct(_leaf, setNode());
 						 _leaf->color = 2;
 					 }
 
 					 template <class InputIterator>
-						 map (InputIterator first, InputIterator last,
+						 set (InputIterator first, InputIterator last,
 								 const key_compare& comp = key_compare(),
 								 const allocator_type& alloc = allocator_type())
 						 {
@@ -492,7 +463,7 @@ namespace ft
 							 _comp = comp;
 							 _alloc = alloc;
 							 _leaf = _nodeAlloc.allocate(1);
-							 _nodeAlloc.construct(_leaf, Node());
+							 _nodeAlloc.construct(_leaf, setNode());
 							 _leaf->color = 2;
 							 insert(first, last);
 							 _leaf->right = getMinimum(_root);
@@ -501,14 +472,14 @@ namespace ft
 							 getMaximum(_root)->right = _leaf;
 						 }
 
-					 map (const map& x)
+					 set (const set& x)
 					 {
 						 _size = 0;
 						 _root = NULL;
 						 _alloc = x.get_allocator();
 						 _comp = x.key_comp();
 						 _leaf = _nodeAlloc.allocate(1);
-						 _nodeAlloc.construct(_leaf, Node());
+						 _nodeAlloc.construct(_leaf, setNode());
 						 _leaf->color = 2;
 						 insert(x.begin(), x.end());
 						 _leaf->right = getMinimum(_root);
@@ -518,7 +489,7 @@ namespace ft
 					 }
 
 					 // DESTRUCTOR
-					 ~map()
+					 ~set()
 					 {
 						 clear();
 						 _nodeAlloc.destroy(_leaf);
@@ -526,7 +497,7 @@ namespace ft
 					 };
 
 					 // OPERATOR=
-					 map& operator= (const map& x)
+					 set& operator= (const set& x)
 					 {
 						 if (this != &x)
 						 {
@@ -602,25 +573,18 @@ namespace ft
 						 return (_nodeAlloc.max_size());
 					 }
 
-					 // ELEMENT ACCESS
-					 mapped_type& operator[] (const key_type& k)
-					 {
-						 return ((insert(ft::make_pair(k, mapped_type())).first)
-								 ->second);
-					 }
-
 					 // MODIFIERS
 					 pair<iterator,bool> insert (const value_type& val)
 					 {
 						 iterator	inserted_here;
 						 bool		is_inserted;
 
-						 inserted_here = find(val.first);
+						 inserted_here = find(val);
 						 if (inserted_here == end())
 						 {
-							 insertNode(val);
+							 insertsetNode(val);
 							 is_inserted = true;
-							 inserted_here = find(val.first);
+							 inserted_here = find(val);
 						 }
 						 else
 							 is_inserted = false;
@@ -629,25 +593,25 @@ namespace ft
 
 					 iterator insert (iterator position, const value_type& val)
 					 {
-						 Node*	N;
+						 setNode*	N;
 
-						 if (position != end() && position->first < val.first)
+						 if (position != end() && *position < val)
 						 {
 							 while (position != end()
-									 && position->first < val.first)
+									 && *position < val)
 								 position++;
 						 }
 						 else if (position != end()
-								 && position->first > val.first)
+								 && *position > val)
 						 {
 							 while (position != end()
-									 && position->first > val.first)
+									 && *position > val)
 								 position--;
 						 }
-						 if (position == end() || position->first != val.first)
+						 if (position == end() || *position != val)
 						 {
-							 insertNode(val);
-							 N = searchTree(_root, val.first);
+							 insertsetNode(val);
+							 N = searchTree(_root, val);
 							 return (*N);
 						 }
 						 else
@@ -663,12 +627,12 @@ namespace ft
 
 					 void erase (iterator position)
 					 {
-						 deleteNode(searchTree(_root, position->first));
+						 deletesetNode(searchTree(_root, *position));
 					 }
 
-					 size_type erase (const key_type& k)
+					 size_type erase (const value_type& val)
 					 {
-						 iterator	toDel = find(k);
+						 iterator	toDel = find(val);
 
 						 if (toDel == end())
 							 return (0);
@@ -682,21 +646,21 @@ namespace ft
 
 						 while (prev != last)
 						 {
-							 deleteNode(searchTree(_root, prev->first));
+							 deletesetNode(searchTree(_root, *prev));
 							 prev = first++;
 						 }
 					 }
 
-					 void swap (map& x)
+					 void swap (set& x)
 					 {
 
-						 typename Alloc::template rebind<Node >::other
+						 typename Alloc::template rebind<setNode >::other
 							 nodeAlloc_tmp = _nodeAlloc;
 						 Alloc		alloc_tmp = _alloc;
 						 Compare	comp_tmp = _comp;
 						 size_type	size_tmp = _size;
-						 Node*		root_tmp = _root;
-						 Node*		leaf_tmp = _leaf;
+						 setNode*		root_tmp = _root;
+						 setNode*		leaf_tmp = _leaf;
 
 						 _alloc = x._alloc;
 						 _comp = x._comp;
@@ -713,7 +677,7 @@ namespace ft
 
 					 void clear()
 					 {
-						 clearNode(_root);
+						 clearsetNode(_root);
 						 _size = 0;
 						 _root = NULL;
 					 }
@@ -732,7 +696,7 @@ namespace ft
 					 // OPERATIONS
 					 iterator find (const key_type& k)
 					 {
-						 Node*	ret;
+						 setNode*	ret;
 
 						 ret = searchTree(_root, k);
 						 if (!ret)
@@ -742,7 +706,7 @@ namespace ft
 
 					 const_iterator find (const key_type& k) const
 					 {
-						 Node*	ret;
+						 setNode*	ret;
 
 						 ret = searchTree(_root, k);
 						 if (!ret)
@@ -761,7 +725,7 @@ namespace ft
 					 {
 						 iterator	ret = begin();
 
-						 while (ret != end() && _comp(ret->first, k))
+						 while (ret != end() && _comp(*ret, k))
 							 ret++;
 						 return (ret);
 					 }
@@ -770,7 +734,7 @@ namespace ft
 					 {
 						 const_iterator	ret = begin();
 
-						 while (ret != end() && _comp(ret->first, k))
+						 while (ret != end() && _comp(*ret, k))
 							 ret++;
 						 return (ret);
 					 }
@@ -779,8 +743,7 @@ namespace ft
 					 {
 						 iterator ret = lower_bound(k);
 						 if (ret == end()
-								 || (_comp(k, ret->first)
-									 && !_comp(ret->first, k)))
+								 || (_comp(k, *ret) && !_comp(*ret, k)))
 							 return (ret);
 						 ret++;
 						 return (ret);
@@ -790,8 +753,7 @@ namespace ft
 					 {
 						 const_iterator ret = lower_bound(k);
 						 if (ret == end()
-								 || (_comp(k, ret->first)
-									 && !_comp(ret->first, k)))
+								 || (_comp(k, *ret) && !_comp(*ret, k)))
 							 return (ret);
 						 ret++;
 						 return (ret);
@@ -816,14 +778,14 @@ namespace ft
 
 			 };
 
-	template< class Key, class T, class Compare, class Alloc >
-		bool operator==( const map<Key,T,Compare,Alloc>& lhs,
-				const map<Key,T,Compare,Alloc>& rhs )
+	template< class T, class Compare, class Alloc >
+		bool operator==( const set<T,Compare,Alloc>& lhs,
+				const set<T,Compare,Alloc>& rhs )
 		{
 			if (lhs.size() != rhs.size())
 				return (0);
-			mapIterator<const pair<const Key, T> > left(lhs.begin());
-			mapIterator<const pair<const Key, T> > right(rhs.begin());
+			setIterator<const T> left(lhs.begin());
+			setIterator<const T> right(rhs.begin());
 
 			while (left != lhs.end() && *left == *right)
 			{
@@ -835,45 +797,45 @@ namespace ft
 			return (0);
 		}
 
-	template< class Key, class T, class Compare, class Alloc >
-		bool operator!=( const map<Key,T,Compare,Alloc>& lhs,
-				const map<Key,T,Compare,Alloc>& rhs )
+	template< class T, class Compare, class Alloc >
+		bool operator!=( const set<T,Compare,Alloc>& lhs,
+				const set<T,Compare,Alloc>& rhs )
 		{
 			return (!(lhs == rhs));
 		}
 
-	template< class Key, class T, class Compare, class Alloc >
-		bool operator<( const map<Key,T,Compare,Alloc>& lhs,
-				const map<Key,T,Compare,Alloc>& rhs )
+	template< class T, class Compare, class Alloc >
+		bool operator<( const set<T,Compare,Alloc>& lhs,
+				const set<T,Compare,Alloc>& rhs )
 		{
 			return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
 						rhs.begin(), rhs.end()));
 		}
 
-	template< class Key, class T, class Compare, class Alloc >
-		bool operator<=( const map<Key,T,Compare,Alloc>& lhs,
-				const map<Key,T,Compare,Alloc>& rhs )
+	template< class T, class Compare, class Alloc >
+		bool operator<=( const set<T,Compare,Alloc>& lhs,
+				const set<T,Compare,Alloc>& rhs )
 		{
 			return (lhs < rhs || lhs == rhs);
 		}
 
-	template< class Key, class T, class Compare, class Alloc >
-		bool operator>( const map<Key,T,Compare,Alloc>& lhs,
-				const map<Key,T,Compare,Alloc>& rhs )
+	template< class T, class Compare, class Alloc >
+		bool operator>( const set<T,Compare,Alloc>& lhs,
+				const set<T,Compare,Alloc>& rhs )
 		{
 			return (!(lhs <= rhs));
 		}
 
-	template< class Key, class T, class Compare, class Alloc >
-		bool operator>=( const map<Key,T,Compare,Alloc>& lhs,
-				const map<Key,T,Compare,Alloc>& rhs )
+	template< class T, class Compare, class Alloc >
+		bool operator>=( const set<T,Compare,Alloc>& lhs,
+				const set<T,Compare,Alloc>& rhs )
 		{
 			return (lhs > rhs || lhs == rhs);
 		}
 
-	template< class Key, class T, class Compare, class Alloc >
-		void swap( map<Key,T,Compare,Alloc>& lhs,
-				map<Key,T,Compare,Alloc>& rhs )
+	template< class Key, class Compare, class Alloc >
+		void swap( set<Key,Compare,Alloc>& lhs,
+				set<Key,Compare,Alloc>& rhs )
 		{
 			lhs.swap(rhs);
 		}
