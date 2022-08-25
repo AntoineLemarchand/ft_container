@@ -391,7 +391,7 @@ namespace	ft
 					size_type	capa_tmp = _capacity;
 					size_type	size_tmp = _size;
 
-					if (*this == x)
+					if (this == &x)
 						return;
 					_content = x._content;
 					_capacity = x._capacity;

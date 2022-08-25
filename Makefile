@@ -6,13 +6,13 @@
 #    By: alemarch <alemarch@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/08/16 14:33:53 by alemarch          #+#    #+#              #
-#    Updated: 2022/08/19 09:43:15 by alemarch         ###   ########.fr        #
+#    Updated: 2022/08/25 09:39:38 by alemarch         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 NAME				= 	compare_containers
 
 SRCDIR				= 	srcs/
-SRCFILES			=	main
+SRCFILES			=	main#Subject
 SRCTYPE				=	.cpp
 
 INCDIR				= includes includes/vector includes/stack includes/map \
@@ -20,7 +20,7 @@ INCDIR				= includes includes/vector includes/stack includes/map \
 
 RM					= rm -f
 
-ADDITIONNALFLAGS	= -g#-fsanitize=address
+ADDITIONNALFLAGS	= #-g -fsanitize=address
 
 # **************************************************************************** # 
 #                         DO NOT EDIT BELOW THIS LINE                          #
